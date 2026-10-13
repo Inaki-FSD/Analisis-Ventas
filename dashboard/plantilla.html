@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radiografía de ventas Olist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: informe de una columna que se lee de arriba abajo, con navegación fija por pregunta */
+:root {
+  --bg: #f4f6f3;
+  --surface: #ffffff;
+  --ink: #15211e;
+  --muted: #5b6864;
+  --line: #dce2de;
+  --accent: #0e6b5c;
+  --accent-soft: #d5ebe5;
+  --gold: #b97c06;
+  --alert: #b2462b;
+  --bar-soft: #b9c7c2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1513; --surface: #161f1c; --ink: #e5ece9; --muted: #95a49f; --line: #27332f;
+    --accent: #43c2a6; --accent-soft: #173a32; --gold: #e3ad48; --alert: #e2805f; --bar-soft: #3b4a45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1513; --surface: #161f1c; --ink: #e5ece9; --muted: #95a49f; --line: #27332f;
+  --accent: #43c2a6; --accent-soft: #173a32; --gold: #e3ad48; --alert: #e2805f; --bar-soft: #3b4a45;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.55 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Navegación */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 17px; white-space: nowrap; }
+.brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-left: auto; }
+.nav-links a {
+  text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500;
+  padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+}
+.nav-links a:hover { color: var(--ink); background: var(--accent-soft); }
+@media (max-width: 720px) { .brand { display: none; } .nav-links { margin-left: 0; } }
+
+/* Portada */
+.hero { padding-block: 56px 32px; display: grid; gap: 18px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-size: clamp(36px, 6vw, 64px); max-width: 16ch; letter-spacing: -.02em; }
+.lead { font-size: clamp(17px, 2vw, 20px); color: var(--muted); max-width: 62ch; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); border-block: 1px solid var(--line); margin-top: 12px; }
+.kpi { padding: 20px 18px; display: grid; gap: 4px; }
+.kpi + .kpi { border-left: 1px solid var(--line); }
+.kpi .v { white-space: nowrap; font-family: var(--f-display); font-size: clamp(24px, 2.6vw, 34px); font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 13px; color: var(--muted); }
+@media (max-width: 860px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpi + .kpi { border-left: 0; }
+  .kpi { border-bottom: 1px solid var(--line); }
+  .kpi:nth-child(even) { border-left: 1px solid var(--line); }
+  .kpi:last-child { grid-column: 1 / -1; border-bottom: 0; }
+}
+
+/* Respuestas rápidas */
+.quick-title { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 28px; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 12px; }
+.qcard {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; display: grid; gap: 8px; align-content: start;
+  text-decoration: none; color: inherit; transition: border-color .15s, transform .15s;
+}
+.qcard:hover { border-color: var(--accent); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .qcard:hover { transform: none; } }
+.qcard .q { font-size: 13px; color: var(--muted); font-weight: 500; }
+.qcard .big { font-family: var(--f-display); font-size: 32px; font-weight: 700; color: var(--accent); line-height: 1; }
+.qcard .t { font-size: 15px; }
+.qcard .go { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+@media (max-width: 900px) { .quick { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .quick { grid-template-columns: 1fr; } }
+
+/* Secciones */
+section.block { padding-block: 64px 8px; display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 10px; border-top: 2px solid var(--ink); padding-top: 18px; }
+.sec-head h2 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.015em; max-width: 22ch; }
+.sec-head .lead { font-size: 18px; }
+.grid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; }
+.grid2 > * { min-width: 0; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel h3 { font-size: 19px; }
+.panel .sub { font-size: 14px; color: var(--muted); }
+.chart { position: relative; height: 300px; }
+.chart.tall { height: 380px; }
+
+.toggle { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; justify-self: start; }
+.toggle button {
+  font: 500 13px var(--f-body); color: var(--muted); background: none; border: 0;
+  padding: 6px 14px; border-radius: 999px; cursor: pointer;
+}
+.toggle button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+.panel-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+
+/* Barras 100% en HTML */
+.stack { display: grid; gap: 10px; }
+.stack-row { display: grid; gap: 6px; }
+.stack-row .lbl { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+.bar100 { display: flex; height: 30px; border-radius: 8px; overflow: hidden; background: var(--bg); }
+.bar100 > div { display: flex; align-items: center; padding-inline: 8px; font: 500 12px var(--f-num); color: #fff; white-space: nowrap; overflow: hidden; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fact { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: grid; gap: 2px; }
+.fact.gold { border-color: var(--gold); }
+.fact .v { font-family: var(--f-display); font-size: 26px; font-weight: 700; }
+.fact .l { font-size: 14px; color: var(--muted); }
+@media (max-width: 720px) { .facts { grid-template-columns: 1fr; } }
+
+/* Qué haría */
+.action {
+  background: var(--accent-soft); border-radius: 16px; padding: 22px 24px;
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: start;
+}
+.action .tag { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); grid-row: span 2; padding-top: 3px; }
+.action p { max-width: 70ch; }
+.action strong { font-weight: 600; }
+@media (max-width: 600px) { .action { grid-template-columns: 1fr; } .action .tag { grid-row: auto; } }
+
+/* Heatmap */
+.heat-wrap { overflow-x: auto; }
+.heat { display: grid; grid-template-columns: 38px repeat(24, minmax(18px, 1fr)); gap: 3px; min-width: 560px; }
+.heat .h { font: 500 11px var(--f-num); color: var(--muted); text-align: center; }
+.heat .d { font-size: 12px; color: var(--muted); display: flex; align-items: center; }
+.heat .c { aspect-ratio: 1 / 1; border-radius: 4px; max-width: 100%; }
+.heat-scale { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.heat-scale span.g { width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--bg), var(--accent)); border: 1px solid var(--line); }
+
+/* Simulador */
+.sim { display: grid; gap: 16px; }
+.sim label { font-size: 15px; font-weight: 500; }
+.sim input[type=range] { width: 100%; accent-color: var(--accent); }
+.sim-out { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sim-out div { display: grid; gap: 2px; }
+.sim-out .v { font-family: var(--f-display); font-size: clamp(28px, 4vw, 40px); font-weight: 700; color: var(--accent); }
+.sim-out .l { font-size: 13px; color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); }
+
+/* Tabla */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filters select {
+  font: 500 14px var(--f-body); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+}
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 620px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--bg); }
+th button { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+td.r, th.r { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+.chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.chip.rec { background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold); }
+.chip.val { background: var(--accent-soft); color: var(--accent); }
+.more { justify-self: start; font: 600 14px var(--f-body); color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+.more:hover { border-color: var(--accent); }
+
+/* Método */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: s; }
+.step { padding: 18px 20px 18px 0; display: grid; gap: 6px; align-content: start; position: relative; }
+.step + .step { padding-left: 20px; border-left: 1px solid var(--line); }
+.step .n { font: 500 12px var(--f-num); color: var(--accent); }
+.step h3 { font-size: 18px; }
+.step p { font-size: 14px; color: var(--muted); }
+.step .num { color: var(--ink); }
+@media (max-width: 860px) {
+  .steps { grid-template-columns: 1fr 1fr; }
+  .step:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 520px) {
+  .steps { grid-template-columns: 1fr; }
+  .step + .step { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+}
+.decisions { display: grid; gap: 10px; padding-left: 20px; margin: 0; max-width: 75ch; }
+.decisions li { color: var(--muted); }
+.decisions strong { color: var(--ink); font-weight: 600; }
+
+footer { padding-block: 56px 40px; color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Secciones">
+  <div class="wrap">
+    <div class="brand">Ventas <span>Olist</span></div>
+    <div class="nav-links">
+      <a href="#clientes">Clientes</a>
+      <a href="#productos">Productos</a>
+      <a href="#periodos">Períodos</a>
+      <a href="#recontactar">Recontactar</a>
+      <a href="#metodo">Cómo lo hice</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Proyecto de análisis de datos</div>
+    <h1>Radiografía de ventas de un e-commerce</h1>
+    <p class="lead" id="lead"></p>
+    <div class="kpis" id="kpis"></div>
+    <p class="quick-title">Las cuatro respuestas, de un vistazo</p>
+    <div class="quick" id="quick"></div>
+  </header>
+
+  <!-- 1. Clientes -->
+  <section class="block" id="clientes">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 1 de 4 · ¿Quiénes son los mejores clientes?</div>
+      <h2 id="h-clientes"></h2>
+      <p class="lead" id="t-clientes"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Cuánto aporta cada grupo de clientes</h3>
+        <p class="sub">Ordené a los clientes de mayor a menor gasto y los dividí en 10 grupos iguales. "Top" es el 10% que más gasta.</p>
+        <div class="chart"><canvas id="ch-deciles" aria-label="Porcentaje de ingresos por grupo de clientes"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>¿Vuelven a comprar?</h3>
+        <p class="sub">Clientes según cuántos pedidos hicieron en dos años.</p>
+        <div class="stack" id="recurrencia"></div>
+        <div class="legend" id="leg-recurrencia"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div style="display:grid;gap:4px">
+          <h3>Dónde están los clientes</h3>
+          <p class="sub" id="t-estados"></p>
+        </div>
+      </div>
+      <div class="chart"><canvas id="ch-estados" aria-label="Ingresos por estado de Brasil"></canvas></div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Lanzar un programa de segunda compra.</strong> Con 97 de cada 100 clientes comprando una sola vez, cada punto de recompra vale más que captar clientes nuevos: un descuento enviado 30 días después de la primera entrega es una prueba barata para empezar.</p>
+    </div>
+  </section>
+
+  <!-- 2. Productos -->
+  <section class="block" id="productos">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 2 de 4 · ¿Qué productos generan más ingresos y cuáles venden poco?</div>
+      <h2 id="h-productos"></h2>
+      <p class="lead" id="t-productos"></p>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3 id="cat-title">Las 10 categorías que más facturan</h3>
+        <div class="toggle" role="group" aria-label="Elegir ranking">
+          <button type="button" id="cat-top" aria-pressed="true">Más venden</button>
+          <button type="button" id="cat-bottom" aria-pressed="false">Menos venden</button>
+        </div>
+      </div>
+      <div class="chart tall"><canvas id="ch-categorias" aria-label="Ingresos por categoría"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>¿Cuántas veces se vendió cada producto?</h3>
+      <p class="sub" id="t-rotacion"></p>
+      <div class="bar100" id="rotacion" style="height:40px"></div>
+      <div class="legend" id="leg-rotacion"></div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Proteger lo que funciona y depurar el resto.</strong> Asegurar stock y visibilidad en las 5 categorías que sostienen el 40% de la facturación, y revisar los miles de productos que se vendieron una sola vez: o se les da exposición o se dejan de publicar.</p>
+    </div>
+  </section>
+
+  <!-- 3. Períodos -->
+  <section class="block" id="periodos">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 3 de 4 · ¿En qué períodos se concentran las ventas?</div>
+      <h2 id="h-periodos"></h2>
+      <p class="lead">Las ventas crecieron todo 2017 y se estabilizaron en 2018. El pico es noviembre de 2017, empujado por un solo día.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Evolución mes a mes</h3>
+        <div class="toggle" role="group" aria-label="Elegir métrica">
+          <button type="button" id="m-ing" aria-pressed="true">Ingresos</button>
+          <button type="button" id="m-ped" aria-pressed="false">Pedidos</button>
+        </div>
+      </div>
+      <div class="chart"><canvas id="ch-mensual" aria-label="Ventas mensuales"></canvas></div>
+      <p class="note">Enero 2017 a agosto 2018. Los meses de 2016 y de septiembre 2018 en adelante tienen muy pocos datos y no se muestran.</p>
+    </div>
+    <div class="facts" id="facts-periodos"></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>¿Qué día y a qué hora se compra?</h3>
+        <p class="sub">Cada cuadro es una hora de un día de la semana. Más oscuro, más pedidos.</p>
+        <div class="heat-wrap"><div class="heat" id="heat"></div></div>
+        <div class="heat-scale">Menos <span class="g"></span> Más</div>
+      </div>
+      <div class="panel">
+        <h3>Pedidos por día de la semana</h3>
+        <div class="chart"><canvas id="ch-dias" aria-label="Pedidos por día de la semana"></canvas></div>
+      </div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Ordenar el calendario comercial.</strong> Preparar stock y logística para Black Friday con semanas de anticipación, y concentrar mails y promociones de lunes a miércoles, en horario diurno, cuando la gente realmente compra.</p>
+    </div>
+  </section>
+
+  <!-- 4. Recontactar -->
+  <section class="block" id="recontactar">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 4 de 4 · ¿Qué clientes dejaron de comprar y conviene recontactar?</div>
+      <h2 id="h-recontactar"></h2>
+      <p class="lead" id="t-recontactar"></p>
+    </div>
+    <div class="panel">
+      <h3>Clientes según su última compra</h3>
+      <div class="bar100" id="segmentos" style="height:44px"></div>
+      <div class="legend" id="leg-segmentos"></div>
+    </div>
+    <div class="grid2">
+      <div class="panel sim">
+        <h3>¿Cuánto valdría recuperarlos?</h3>
+        <label for="sim-pct">Si vuelve a comprar el <span id="sim-pct-out" class="num">10%</span> de los clientes a recontactar…</label>
+        <input type="range" id="sim-pct" min="1" max="30" value="10" step="1">
+        <div class="sim-out">
+          <div><span class="v num" id="sim-cli"></span><span class="l">clientes recuperados</span></div>
+          <div><span class="v num" id="sim-ing"></span><span class="l">ingresos extra con una compra cada uno</span></div>
+        </div>
+        <p class="note" id="sim-note"></p>
+      </div>
+      <div class="panel">
+        <h3>Cómo elegí a quién recontactar</h3>
+        <p class="sub">No todos los inactivos valen el esfuerzo. Me quedé con los que llevan más de 6 meses sin comprar y además cumplen al menos una condición:</p>
+        <div class="stack">
+          <div><span class="chip rec">Recurrente</span> compró 2 veces o más</div>
+          <div><span class="chip val">Alto valor</span> gastó R$ 300 o más</div>
+        </div>
+        <div class="facts" id="facts-recontactar" style="grid-template-columns:1fr 1fr"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div style="display:grid;gap:4px">
+          <h3>Lista priorizada para el equipo comercial</h3>
+          <p class="sub">Los 500 clientes inactivos de mayor gasto. Los identificadores son anónimos en el dataset original.</p>
+        </div>
+        <div class="filters">
+          <select id="f-estado" aria-label="Filtrar por estado"></select>
+          <select id="f-motivo" aria-label="Filtrar por motivo">
+            <option value="">Todos los motivos</option>
+            <option value="rec">Recurrentes</option>
+            <option value="val">Alto valor</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th><button type="button" data-sort="ultima_compra">Última compra <span></span></button></th>
+            <th class="r"><button type="button" data-sort="dias_sin_comprar">Días sin comprar <span></span></button></th>
+            <th class="r"><button type="button" data-sort="pedidos">Pedidos <span></span></button></th>
+            <th class="r"><button type="button" data-sort="gasto">Gasto total <span>↓</span></button></th>
+            <th>Motivo</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="panel-head">
+        <p class="note" id="t-count"></p>
+        <button type="button" class="more" id="more">Mostrar 15 más</button>
+      </div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Empezar la reactivación por arriba de esta lista.</strong> Una campaña personalizada a los clientes de mayor gasto, medida contra un grupo de control, dice en pocas semanas si vale la pena escalarla al resto.</p>
+    </div>
+  </section>
+
+  <!-- Método -->
+  <section class="block" id="metodo">
+    <div class="sec-head">
+      <div class="eyebrow">Cómo lo hice</div>
+      <h2>De seis archivos sueltos a respuestas de negocio</h2>
+      <p class="lead">El trabajo más grande fue organizar los datos: unir tablas, limpiar fechas, traducir categorías y definir reglas claras antes de contar nada.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">PASO 1</span><h3>Datos crudos</h3><p>6 archivos públicos de Olist: clientes, pedidos, productos, pagos y más. <span class="num">99.441</span> pedidos en total.</p></div>
+      <div class="step"><span class="n">PASO 2</span><h3>Limpieza</h3><p>Con Python y pandas: fechas, faltantes, categorías traducidas y todo cargado en una base de datos.</p></div>
+      <div class="step"><span class="n">PASO 3</span><h3>Consultas</h3><p>Con SQL: una consulta por pregunta de negocio, que cruza clientes, pedidos y productos.</p></div>
+      <div class="step"><span class="n">PASO 4</span><h3>Este tablero</h3><p>Un script que toma los resultados y arma esta página. Si cambian los datos, se regenera sola.</p></div>
+    </div>
+    <div class="panel">
+      <h3>Decisiones que tomé</h3>
+      <ul class="decisions">
+        <li><strong>Solo cuento pedidos entregados.</strong> Los cancelados o no disponibles no son ventas reales.</li>
+        <li><strong>Ingresos sin envío.</strong> Uso el precio de los productos, sin el costo de flete.</li>
+        <li><strong>Un cliente es una persona, no un pedido.</strong> El sistema de Olist asigna un código nuevo en cada compra; uso el identificador único de la persona para no contar dos veces al mismo cliente.</li>
+        <li><strong>"Inactivo" es más de 180 días sin comprar</strong>, medido desde la última fecha con ventas del dataset. Es un criterio ajustable.</li>
+      </ul>
+    </div>
+    <p>Código completo en <a href="https://github.com/Inaki-FSD/Analisis-Ventas" target="_blank" rel="noopener">github.com/Inaki-FSD/Analisis-Ventas</a>.</p>
+  </section>
+
+  <footer>
+    <p>Datos: Brazilian E-Commerce Public Dataset by Olist (Kaggle, licencia CC BY-NC-SA 4.0).</p>
+    <p>Montos en reales brasileños (R$). Período analizado: <span id="periodo"></span>.</p>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+const D = /*__DATOS__*/null;
+
+// ---------- Formato
+const nf = new Intl.NumberFormat("es-AR");
+const nf1 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 });
+const N = v => nf.format(Math.round(v));
+const pct = v => nf1.format(v) + "%";
+function R(v) {
+  if (v >= 1e6) return "R$ " + nf1.format(v / 1e6) + " M";
+  if (v >= 1e4) return "R$ " + N(v / 1e3) + " mil";
+  return "R$ " + N(v);
+}
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+const mesLbl = m => { const [y, mm] = m.split("-"); return MESES[+mm - 1] + " " + y.slice(2); };
+const mesLargo = m => { const [y, mm] = m.split("-"); return ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][+mm - 1] + " de " + y; };
+const fecha = d => { const [y, m, dd] = d.split("-"); return `${dd}/${m}/${y}`; };
+const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const DIAS_L = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const ESTADOS = { SP: "São Paulo", RJ: "Río de Janeiro", MG: "Minas Gerais", RS: "Rio Grande do Sul", PR: "Paraná", SC: "Santa Catarina", BA: "Bahía", DF: "Distrito Federal", GO: "Goiás", ES: "Espírito Santo", PE: "Pernambuco", CE: "Ceará" };
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// ---------- Cálculos de apoyo
+const K = D.kpis;
+const totalCat = D.categorias.reduce((s, c) => s + c.ingresos, 0);
+const top5 = D.categorias.slice(0, 5).reduce((s, c) => s + c.ingresos, 0) / totalCat * 100;
+const unaVez = D.rotacion[0];
+const mejorDia = D.mejores_dias[0];
+const picoMes = D.mensual.reduce((a, b) => (b.ingresos > a.ingresos ? b : a));
+const rec1 = D.recurrencia[0];
+const inactivos = D.segmentos[2];
+const RC = D.recontactar;
+const diasOrd = [1, 2, 3, 4, 5, 6, 0];
+const diaTop = D.dia_semana.reduce((a, b) => (b.pedidos > a.pedidos ? b : a));
+const sp = D.estados[0];
+
+// ---------- Textos
+$("lead").textContent = `Organicé y analicé ${N(K.pedidos)} pedidos de Olist, un marketplace de Brasil, para responder cuatro preguntas de negocio y proponer acciones concretas.`;
+$("periodo").textContent = `${fecha(K.desde)} al ${fecha(K.hasta)}`;
+
+const kpis = [
+  [R(K.ingresos), "facturados"],
+  [N(K.pedidos), "pedidos entregados"],
+  [N(K.clientes), "clientes"],
+  ["R$ " + N(K.ticket_promedio), "ticket promedio"],
+  [N(K.productos), "productos distintos"],
+];
+$("kpis").innerHTML = kpis.map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+const quick = [
+  ["clientes", "Mejores clientes", pct(D.deciles[0].pct_ingresos), "de los ingresos viene del 10% de clientes que más gasta."],
+  ["productos", "Productos", "5 categorías", `concentran el ${N(top5)}% de la facturación.`],
+  ["periodos", "Períodos", R(mejorDia.ingresos), "vendidos en un solo día: Black Friday 2017, el récord."],
+  ["recontactar", "Recontactar", N(RC.clientes), `clientes valiosos dejaron de comprar. Gastaron ${R(RC.gasto_historico)}.`],
+];
+$("quick").innerHTML = quick.map(([id, q, big, t]) =>
+  `<a class="qcard" href="#${id}"><span class="q">${q}</span><span class="big">${big}</span><span class="t">${t}</span><span class="go">Ver detalle →</span></a>`).join("");
+
+$("h-clientes").textContent = `El 10% de los clientes genera el ${N(D.deciles[0].pct_ingresos)}% de los ingresos, pero casi nadie vuelve`;
+$("t-clientes").textContent = `${N(rec1.pct_clientes)} de cada 100 clientes compraron una sola vez en dos años. El negocio depende de atraer gente nueva todo el tiempo.`;
+$("t-estados").textContent = `${ESTADOS[sp.estado]} concentra el ${N(sp.pct_ingresos)}% de los ingresos. Los 3 estados del sudeste suman más de la mitad.`;
+
+$("h-productos").textContent = `Cinco categorías sostienen el ${N(top5)}% de la facturación`;
+$("t-productos").textContent = `Salud y belleza lidera, seguida por relojes y regalos. En el otro extremo hay categorías que vendieron apenas unas pocas unidades en dos años.`;
+$("t-rotacion").textContent = `El ${N(unaVez.pct_productos)}% de los ${N(K.productos)} productos se vendió una sola vez en todo el período.`;
+
+$("h-periodos").textContent = `${mesLargo(picoMes.mes).replace(/^./, c => c.toUpperCase())} fue el mejor mes, gracias al Black Friday`;
+$("facts-periodos").innerHTML = [
+  ["gold", R(mejorDia.ingresos), `en un solo día (${fecha(mejorDia.dia)}), más del doble que cualquier otro día`],
+  ["", "Los " + DIAS_L[diaTop.dia_semana], "son el día con más pedidos. Sábado y domingo, los más flojos"],
+  ["", "76%", "de los pedidos entra entre las 10 y las 22 h. De madrugada casi no se compra"],
+].map(([c, v, l]) => `<div class="fact ${c}"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+$("h-recontactar").textContent = `${N(RC.clientes)} clientes valiosos dejaron de comprar`;
+$("t-recontactar").textContent = `El ${N(inactivos.pct_clientes)}% de los clientes lleva más de 6 meses sin comprar. Entre ellos identifiqué a los que más vale la pena recuperar.`;
+
+// ---------- Barras 100% (HTML)
+function bar100(el, legEl, parts) {
+  el.innerHTML = parts.map(p => `<div style="width:${p.w}%;background:${p.c}" title="${p.name}: ${p.txt}">${p.w >= 8 ? p.txt : ""}</div>`).join("");
+  if (legEl) legEl.innerHTML = parts.map(p => `<span><i style="background:${p.c}"></i>${p.name} · ${p.txt}</span>`).join("");
+}
+
+function pintarHTML() {
+  const cRec = [css("--accent"), css("--gold"), css("--alert")];
+  // Recurrencia: % clientes vs % ingresos
+  $("recurrencia").innerHTML = `
+    <div class="stack-row"><div class="lbl"><span>Clientes</span></div><div class="bar100" id="rb1"></div></div>
+    <div class="stack-row"><div class="lbl"><span>Ingresos</span></div><div class="bar100" id="rb2"></div></div>`;
+  const mk = key => D.recurrencia.map((r, i) => ({ name: r.segmento, w: r[key], txt: pct(r[key]), c: cRec[i] }));
+  bar100($("rb1"), $("leg-recurrencia"), mk("pct_clientes").map(p => ({ ...p })));
+  bar100($("rb2"), null, mk("pct_ingresos"));
+  $("leg-recurrencia").innerHTML = D.recurrencia.map((r, i) => `<span><i style="background:${cRec[i]}"></i>${r.segmento}: ${N(r.clientes)} clientes</span>`).join("");
+
+  const cRot = [css("--alert"), css("--gold"), css("--bar-soft"), css("--accent")];
+  bar100($("rotacion"), $("leg-rotacion"), D.rotacion.map((r, i) => ({ name: r.rango_ventas, w: r.pct_productos, txt: pct(r.pct_productos), c: cRot[i] })));
+
+  const cSeg = [css("--accent"), css("--gold"), css("--alert")];
+  bar100($("segmentos"), $("leg-segmentos"), D.segmentos.map((s, i) => ({ name: s.estado_cliente.replace(/^\d\.\s*/, ""), w: s.pct_clientes, txt: `${pct(s.pct_clientes)} (${N(s.clientes)})`, c: cSeg[i] })));
+  $("leg-segmentos").innerHTML = D.segmentos.map((s, i) => `<span><i style="background:${cSeg[i]}"></i>${s.estado_cliente.replace(/^\d\.\s*/, "")}: ${N(s.clientes)} clientes</span>`).join("");
+
+  // Heatmap
+  const max = Math.max(...D.heatmap.map(h => h.pedidos));
+  const m = {};
+  D.heatmap.forEach(h => (m[h.dia_semana + "-" + h.hora] = h.pedidos));
+  let html = `<span></span>` + Array.from({ length: 24 }, (_, h) => `<span class="h">${h % 3 === 0 ? h : ""}</span>`).join("");
+  diasOrd.forEach(d => {
+    html += `<span class="d">${DIAS[d]}</span>`;
+    for (let h = 0; h < 24; h++) {
+      const v = m[d + "-" + h] || 0;
+      const p = Math.round(6 + (v / max) * 94);
+      html += `<span class="c" style="background:color-mix(in srgb, var(--accent) ${p}%, var(--bg))" title="${DIAS_L[d]} ${h}:00 h · ${N(v)} pedidos"></span>`;
+    }
+  });
+  $("heat").innerHTML = html;
+}
+
+// ---------- Gráficos (Chart.js)
+let charts = [];
+let catModo = "top", mesModo = "ingresos";
+
+function base() {
+  Chart.defaults.font.family = css("--f-body").replace(/"/g, "");
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = css("--muted");
+  Chart.defaults.borderColor = css("--line");
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.maintainAspectRatio = false;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) Chart.defaults.animation = false;
+  Chart.defaults.plugins.tooltip.backgroundColor = css("--ink");
+  Chart.defaults.plugins.tooltip.titleColor = css("--bg");
+  Chart.defaults.plugins.tooltip.bodyColor = css("--bg");
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.displayColors = false;
+}
+
+function hbar(id, labels, data, colors, tip, ticks) {
+  return new Chart($(id), {
+    type: "bar",
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, barPercentage: .78, categoryPercentage: .9 }] },
+    options: {
+      indexAxis: "y",
+      scales: {
+        x: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: ticks } },
+        y: { grid: { display: false }, border: { display: false }, ticks: { color: css("--ink") } },
+      },
+      plugins: { tooltip: { callbacks: { label: tip } } },
+    },
+  });
+}
+
+function chartCategorias() {
+  const top = catModo === "top";
+  const rows = top ? D.categorias.slice(0, 10) : D.categorias.slice(-10).reverse();
+  $("cat-title").textContent = top ? "Las 10 categorías que más facturan" : "Las 10 categorías que menos facturan";
+  const c = top ? css("--accent") : css("--alert");
+  return hbar("ch-categorias", rows.map(r => r.nombre), rows.map(r => r.ingresos), c,
+    ctx => { const r = rows[ctx.dataIndex]; return [`Ingresos: ${R(r.ingresos)}`, `Unidades vendidas: ${N(r.unidades)}`]; },
+    v => R(v));
+}
+
+function chartMensual() {
+  const ing = mesModo === "ingresos";
+  const vals = D.mensual.map(m => (ing ? m.ingresos : m.pedidos));
+  const iPico = D.mensual.indexOf(picoMes);
+  const acc = css("--accent"), gold = css("--gold");
+  return new Chart($("ch-mensual"), {
+    type: "line",
+    data: {
+      labels: D.mensual.map(m => mesLbl(m.mes)),
+      datasets: [{
+        data: vals, borderColor: acc, borderWidth: 2.5, cubicInterpolationMode: "monotone", fill: true,
+        backgroundColor: ctx => {
+          const { chart } = ctx; const a = chart.chartArea; if (!a) return "transparent";
+          const g = chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+          g.addColorStop(0, acc + "40"); g.addColorStop(1, acc + "00"); return g;
+        },
+        pointRadius: vals.map((_, i) => (i === iPico ? 7 : 3)),
+        pointBackgroundColor: vals.map((_, i) => (i === iPico ? gold : acc)),
+        pointBorderColor: vals.map((_, i) => (i === iPico ? gold : acc)),
+        pointHoverRadius: 7,
+      }],
+    },
+    options: {
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, autoSkipPadding: 12 } },
+        y: { beginAtZero: true, grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => (ing ? R(v) : N(v)) } },
+      },
+      plugins: {
+        tooltip: { callbacks: {
+          title: it => mesLargo(D.mensual[it[0].dataIndex].mes),
+          label: ctx => { const m = D.mensual[ctx.dataIndex]; const l = [`Ingresos: ${R(m.ingresos)}`, `Pedidos: ${N(m.pedidos)}`]; if (ctx.dataIndex === iPico) l.push("Black Friday: 24/11/2017"); return l; },
+        } },
+      },
+    },
+  });
+}
+
+function crearGraficos() {
+  charts.forEach(c => c.destroy());
+  base();
+  const acc = css("--accent"), soft = css("--bar-soft");
+
+  const dec = new Chart($("ch-deciles"), {
+    type: "bar",
+    data: {
+      labels: D.deciles.map(d => (d.decil === 1 ? "Top" : d.decil + "°")),
+      datasets: [{ data: D.deciles.map(d => d.pct_ingresos), backgroundColor: D.deciles.map((_, i) => (i === 0 ? acc : soft)), borderRadius: 4 }],
+    },
+    options: {
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: false } },
+        y: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => v + "%" } },
+      },
+      plugins: { tooltip: { callbacks: {
+        title: it => (it[0].dataIndex === 0 ? "El 10% que más gasta" : `Grupo ${it[0].dataIndex + 1} de 10`),
+        label: ctx => { const d = D.deciles[ctx.dataIndex]; return [`${pct(d.pct_ingresos)} de los ingresos`, `${N(d.clientes)} clientes · ${R(d.ingresos)}`]; },
+      } } },
+    },
+  });
+
+  const topE = D.estados.slice(0, 8);
+  const resto = D.estados.slice(8);
+  const est = [...topE.map(e => ({ n: ESTADOS[e.estado] || e.estado, v: e.ingresos, p: e.pct_ingresos, c: e.clientes })),
+    { n: `Otros ${resto.length} estados`, v: resto.reduce((s, e) => s + e.ingresos, 0), p: resto.reduce((s, e) => s + e.pct_ingresos, 0), c: resto.reduce((s, e) => s + e.clientes, 0) }];
+  const estC = hbar("ch-estados", est.map(e => e.n), est.map(e => e.v), est.map((_, i) => (i === 0 ? acc : i === est.length - 1 ? soft : acc + "99")),
+    ctx => { const e = est[ctx.dataIndex]; return [`${R(e.v)} (${pct(e.p)} del total)`, `${N(e.c)} clientes`]; }, v => R(v));
+
+  const dias = diasOrd.map(d => D.dia_semana.find(x => x.dia_semana === d));
+  const diasC = new Chart($("ch-dias"), {
+    type: "bar",
+    data: { labels: dias.map(d => DIAS[d.dia_semana]), datasets: [{ data: dias.map(d => d.pedidos), backgroundColor: dias.map(d => (d === diaTop ? acc : soft)), borderRadius: 4 }] },
+    options: {
+      scales: { x: { grid: { display: false } }, y: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => N(v) } } },
+      plugins: { tooltip: { callbacks: { label: ctx => { const d = dias[ctx.dataIndex]; return [`${N(d.pedidos)} pedidos`, `${R(d.ingresos)}`]; } } } },
+    },
+  });
+
+  charts = [dec, estC, diasC, chartCategorias(), chartMensual()];
+}
+
+function swap(i, fn) { charts[i].destroy(); charts[i] = fn(); }
+
+function toggle(a, b, onA, onB) {
+  $(a).addEventListener("click", () => { $(a).setAttribute("aria-pressed", "true"); $(b).setAttribute("aria-pressed", "false"); onA(); });
+  $(b).addEventListener("click", () => { $(b).setAttribute("aria-pressed", "true"); $(a).setAttribute("aria-pressed", "false"); onB(); });
+}
+toggle("cat-top", "cat-bottom", () => { catModo = "top"; swap(3, chartCategorias); }, () => { catModo = "bottom"; swap(3, chartCategorias); });
+toggle("m-ing", "m-ped", () => { mesModo = "ingresos"; swap(4, chartMensual); }, () => { mesModo = "pedidos"; swap(4, chartMensual); });
+
+// ---------- Simulador
+function simular() {
+  const p = +$("sim-pct").value;
+  const cli = Math.round(RC.clientes * p / 100);
+  $("sim-pct-out").textContent = p + "%";
+  $("sim-cli").textContent = N(cli);
+  $("sim-ing").textContent = R(cli * RC.ticket_promedio);
+}
+$("sim-pct").addEventListener("input", simular);
+$("sim-note").textContent = `Estimación simple: clientes recuperados × ticket promedio de este grupo (R$ ${N(RC.ticket_promedio)} por pedido).`;
+$("facts-recontactar").innerHTML = [
+  ["", N(RC.clientes), "clientes a recontactar"],
+  ["gold", R(RC.gasto_historico), "gastaron en total antes de irse"],
+].map(([c, v, l]) => `<div class="fact ${c}"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+// ---------- Tabla
+const estadosLista = [...new Set(D.lista.map(r => r.estado))].sort();
+$("f-estado").innerHTML = `<option value="">Todos los estados</option>` + estadosLista.map(e => `<option value="${e}">${ESTADOS[e] ? e + " · " + ESTADOS[e] : e}</option>`).join("");
+let orden = { k: "gasto", dir: -1 }, visibles = 15;
+
+function filtrada() {
+  const fe = $("f-estado").value, fm = $("f-motivo").value;
+  return D.lista
+    .filter(r => (!fe || r.estado === fe) && (!fm || (fm === "rec" ? r.pedidos >= 2 : r.pedidos < 2)))
+    .sort((a, b) => (a[orden.k] > b[orden.k] ? 1 : a[orden.k] < b[orden.k] ? -1 : 0) * orden.dir);
+}
+function pintarTabla() {
+  const rows = filtrada();
+  $("tbody").innerHTML = rows.slice(0, visibles).map(r => `<tr>
+    <td class="num">${r.id}…</td>
+    <td>${r.estado}</td>
+    <td class="num">${fecha(r.ultima_compra)}</td>
+    <td class="r num">${N(r.dias_sin_comprar)}</td>
+    <td class="r num">${r.pedidos}</td>
+    <td class="r num">R$ ${N(r.gasto)}</td>
+    <td>${r.pedidos >= 2 ? '<span class="chip rec">Recurrente</span>' : '<span class="chip val">Alto valor</span>'}</td>
+  </tr>`).join("") || `<tr><td colspan="7">Ningún cliente cumple estos filtros.</td></tr>`;
+  $("t-count").textContent = `Mostrando ${Math.min(visibles, rows.length)} de ${N(rows.length)} clientes`;
+  $("more").hidden = visibles >= rows.length;
+  document.querySelectorAll("th button").forEach(b => (b.querySelector("span").textContent = b.dataset.sort === orden.k ? (orden.dir < 0 ? "↓" : "↑") : ""));
+}
+document.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.sort;
+  orden = orden.k === k ? { k, dir: -orden.dir } : { k, dir: -1 };
+  pintarTabla();
+}));
+["f-estado", "f-motivo"].forEach(id => $(id).addEventListener("change", () => { visibles = 15; pintarTabla(); }));
+$("more").addEventListener("click", () => { visibles += 15; pintarTabla(); });
+
+// ---------- Arranque y cambio de tema
+function todo() { pintarHTML(); if (window.Chart) crearGraficos(); }
+todo(); simular(); pintarTabla();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", todo);
+new MutationObserver(todo).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radiografía de ventas Olist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: informe de una columna que se lee de arriba abajo, con navegación fija por pregunta */
+:root {
+  --bg: #f4f6f3;
+  --surface: #ffffff;
+  --ink: #15211e;
+  --muted: #5b6864;
+  --line: #dce2de;
+  --accent: #0e6b5c;
+  --accent-soft: #d5ebe5;
+  --gold: #b97c06;
+  --alert: #b2462b;
+  --bar-soft: #b9c7c2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1513; --surface: #161f1c; --ink: #e5ece9; --muted: #95a49f; --line: #27332f;
+    --accent: #43c2a6; --accent-soft: #173a32; --gold: #e3ad48; --alert: #e2805f; --bar-soft: #3b4a45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1513; --surface: #161f1c; --ink: #e5ece9; --muted: #95a49f; --line: #27332f;
+  --accent: #43c2a6; --accent-soft: #173a32; --gold: #e3ad48; --alert: #e2805f; --bar-soft: #3b4a45;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 16px/1.55 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Navegación */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 20px; height: 56px; }
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 17px; white-space: nowrap; }
+.brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-left: auto; }
+.nav-links a {
+  text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500;
+  padding: 6px 12px; border-radius: 999px; white-space: nowrap;
+}
+.nav-links a:hover { color: var(--ink); background: var(--accent-soft); }
+@media (max-width: 720px) { .brand { display: none; } .nav-links { margin-left: 0; } }
+
+/* Portada */
+.hero { padding-block: 56px 32px; display: grid; gap: 18px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-size: clamp(36px, 6vw, 64px); max-width: 16ch; letter-spacing: -.02em; }
+.lead { font-size: clamp(17px, 2vw, 20px); color: var(--muted); max-width: 62ch; }
+
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); border-block: 1px solid var(--line); margin-top: 12px; }
+.kpi { padding: 20px 18px; display: grid; gap: 4px; }
+.kpi + .kpi { border-left: 1px solid var(--line); }
+.kpi .v { white-space: nowrap; font-family: var(--f-display); font-size: clamp(24px, 2.6vw, 34px); font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 13px; color: var(--muted); }
+@media (max-width: 860px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpi + .kpi { border-left: 0; }
+  .kpi { border-bottom: 1px solid var(--line); }
+  .kpi:nth-child(even) { border-left: 1px solid var(--line); }
+  .kpi:last-child { grid-column: 1 / -1; border-bottom: 0; }
+}
+
+/* Respuestas rápidas */
+.quick-title { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 28px; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 12px; }
+.qcard {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; display: grid; gap: 8px; align-content: start;
+  text-decoration: none; color: inherit; transition: border-color .15s, transform .15s;
+}
+.qcard:hover { border-color: var(--accent); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .qcard:hover { transform: none; } }
+.qcard .q { font-size: 13px; color: var(--muted); font-weight: 500; }
+.qcard .big { font-family: var(--f-display); font-size: 32px; font-weight: 700; color: var(--accent); line-height: 1; }
+.qcard .t { font-size: 15px; }
+.qcard .go { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+@media (max-width: 900px) { .quick { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .quick { grid-template-columns: 1fr; } }
+
+/* Secciones */
+section.block { padding-block: 64px 8px; display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 10px; border-top: 2px solid var(--ink); padding-top: 18px; }
+.sec-head h2 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.015em; max-width: 22ch; }
+.sec-head .lead { font-size: 18px; }
+.grid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; }
+.grid2 > * { min-width: 0; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel h3 { font-size: 19px; }
+.panel .sub { font-size: 14px; color: var(--muted); }
+.chart { position: relative; height: 300px; }
+.chart.tall { height: 380px; }
+
+.toggle { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; justify-self: start; }
+.toggle button {
+  font: 500 13px var(--f-body); color: var(--muted); background: none; border: 0;
+  padding: 6px 14px; border-radius: 999px; cursor: pointer;
+}
+.toggle button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+.panel-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+
+/* Barras 100% en HTML */
+.stack { display: grid; gap: 10px; }
+.stack-row { display: grid; gap: 6px; }
+.stack-row .lbl { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+.bar100 { display: flex; height: 30px; border-radius: 8px; overflow: hidden; background: var(--bg); }
+.bar100 > div { display: flex; align-items: center; padding-inline: 8px; font: 500 12px var(--f-num); color: #fff; white-space: nowrap; overflow: hidden; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fact { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: grid; gap: 2px; }
+.fact.gold { border-color: var(--gold); }
+.fact .v { font-family: var(--f-display); font-size: 26px; font-weight: 700; }
+.fact .l { font-size: 14px; color: var(--muted); }
+@media (max-width: 720px) { .facts { grid-template-columns: 1fr; } }
+
+/* Qué haría */
+.action {
+  background: var(--accent-soft); border-radius: 16px; padding: 22px 24px;
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: start;
+}
+.action .tag { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); grid-row: span 2; padding-top: 3px; }
+.action p { max-width: 70ch; }
+.action strong { font-weight: 600; }
+@media (max-width: 600px) { .action { grid-template-columns: 1fr; } .action .tag { grid-row: auto; } }
+
+/* Heatmap */
+.heat-wrap { overflow-x: auto; }
+.heat { display: grid; grid-template-columns: 38px repeat(24, minmax(18px, 1fr)); gap: 3px; min-width: 560px; }
+.heat .h { font: 500 11px var(--f-num); color: var(--muted); text-align: center; }
+.heat .d { font-size: 12px; color: var(--muted); display: flex; align-items: center; }
+.heat .c { aspect-ratio: 1 / 1; border-radius: 4px; max-width: 100%; }
+.heat-scale { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.heat-scale span.g { width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--bg), var(--accent)); border: 1px solid var(--line); }
+
+/* Simulador */
+.sim { display: grid; gap: 16px; }
+.sim label { font-size: 15px; font-weight: 500; }
+.sim input[type=range] { width: 100%; accent-color: var(--accent); }
+.sim-out { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sim-out div { display: grid; gap: 2px; }
+.sim-out .v { font-family: var(--f-display); font-size: clamp(28px, 4vw, 40px); font-weight: 700; color: var(--accent); }
+.sim-out .l { font-size: 13px; color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); }
+
+/* Tabla */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filters select {
+  font: 500 14px var(--f-body); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+}
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 620px; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--bg); }
+th button { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+td.r, th.r { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+.chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.chip.rec { background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold); }
+.chip.val { background: var(--accent-soft); color: var(--accent); }
+.more { justify-self: start; font: 600 14px var(--f-body); color: var(--accent); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+.more:hover { border-color: var(--accent); }
+
+/* Método */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: s; }
+.step { padding: 18px 20px 18px 0; display: grid; gap: 6px; align-content: start; position: relative; }
+.step + .step { padding-left: 20px; border-left: 1px solid var(--line); }
+.step .n { font: 500 12px var(--f-num); color: var(--accent); }
+.step h3 { font-size: 18px; }
+.step p { font-size: 14px; color: var(--muted); }
+.step .num { color: var(--ink); }
+@media (max-width: 860px) {
+  .steps { grid-template-columns: 1fr 1fr; }
+  .step:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+@media (max-width: 520px) {
+  .steps { grid-template-columns: 1fr; }
+  .step + .step { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+}
+.decisions { display: grid; gap: 10px; padding-left: 20px; margin: 0; max-width: 75ch; }
+.decisions li { color: var(--muted); }
+.decisions strong { color: var(--ink); font-weight: 600; }
+
+footer { padding-block: 56px 40px; color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Secciones">
+  <div class="wrap">
+    <div class="brand">Ventas <span>Olist</span></div>
+    <div class="nav-links">
+      <a href="#clientes">Clientes</a>
+      <a href="#productos">Productos</a>
+      <a href="#periodos">Períodos</a>
+      <a href="#recontactar">Recontactar</a>
+      <a href="#metodo">Cómo lo hice</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Proyecto de análisis de datos</div>
+    <h1>Radiografía de ventas de un e-commerce</h1>
+    <p class="lead" id="lead"></p>
+    <div class="kpis" id="kpis"></div>
+    <p class="quick-title">Las cuatro respuestas, de un vistazo</p>
+    <div class="quick" id="quick"></div>
+  </header>
+
+  <!-- 1. Clientes -->
+  <section class="block" id="clientes">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 1 de 4 · ¿Quiénes son los mejores clientes?</div>
+      <h2 id="h-clientes"></h2>
+      <p class="lead" id="t-clientes"></p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Cuánto aporta cada grupo de clientes</h3>
+        <p class="sub">Ordené a los clientes de mayor a menor gasto y los dividí en 10 grupos iguales. "Top" es el 10% que más gasta.</p>
+        <div class="chart"><canvas id="ch-deciles" aria-label="Porcentaje de ingresos por grupo de clientes"></canvas></div>
+      </div>
+      <div class="panel">
+        <h3>¿Vuelven a comprar?</h3>
+        <p class="sub">Clientes según cuántos pedidos hicieron en dos años.</p>
+        <div class="stack" id="recurrencia"></div>
+        <div class="legend" id="leg-recurrencia"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div style="display:grid;gap:4px">
+          <h3>Dónde están los clientes</h3>
+          <p class="sub" id="t-estados"></p>
+        </div>
+      </div>
+      <div class="chart"><canvas id="ch-estados" aria-label="Ingresos por estado de Brasil"></canvas></div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Lanzar un programa de segunda compra.</strong> Con 97 de cada 100 clientes comprando una sola vez, cada punto de recompra vale más que captar clientes nuevos: un descuento enviado 30 días después de la primera entrega es una prueba barata para empezar.</p>
+    </div>
+  </section>
+
+  <!-- 2. Productos -->
+  <section class="block" id="productos">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 2 de 4 · ¿Qué productos generan más ingresos y cuáles venden poco?</div>
+      <h2 id="h-productos"></h2>
+      <p class="lead" id="t-productos"></p>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3 id="cat-title">Las 10 categorías que más facturan</h3>
+        <div class="toggle" role="group" aria-label="Elegir ranking">
+          <button type="button" id="cat-top" aria-pressed="true">Más venden</button>
+          <button type="button" id="cat-bottom" aria-pressed="false">Menos venden</button>
+        </div>
+      </div>
+      <div class="chart tall"><canvas id="ch-categorias" aria-label="Ingresos por categoría"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>¿Cuántas veces se vendió cada producto?</h3>
+      <p class="sub" id="t-rotacion"></p>
+      <div class="bar100" id="rotacion" style="height:40px"></div>
+      <div class="legend" id="leg-rotacion"></div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Proteger lo que funciona y depurar el resto.</strong> Asegurar stock y visibilidad en las 5 categorías que sostienen el 40% de la facturación, y revisar los miles de productos que se vendieron una sola vez: o se les da exposición o se dejan de publicar.</p>
+    </div>
+  </section>
+
+  <!-- 3. Períodos -->
+  <section class="block" id="periodos">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 3 de 4 · ¿En qué períodos se concentran las ventas?</div>
+      <h2 id="h-periodos"></h2>
+      <p class="lead">Las ventas crecieron todo 2017 y se estabilizaron en 2018. El pico es noviembre de 2017, empujado por un solo día.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Evolución mes a mes</h3>
+        <div class="toggle" role="group" aria-label="Elegir métrica">
+          <button type="button" id="m-ing" aria-pressed="true">Ingresos</button>
+          <button type="button" id="m-ped" aria-pressed="false">Pedidos</button>
+        </div>
+      </div>
+      <div class="chart"><canvas id="ch-mensual" aria-label="Ventas mensuales"></canvas></div>
+      <p class="note">Enero 2017 a agosto 2018. Los meses de 2016 y de septiembre 2018 en adelante tienen muy pocos datos y no se muestran.</p>
+    </div>
+    <div class="facts" id="facts-periodos"></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>¿Qué día y a qué hora se compra?</h3>
+        <p class="sub">Cada cuadro es una hora de un día de la semana. Más oscuro, más pedidos.</p>
+        <div class="heat-wrap"><div class="heat" id="heat"></div></div>
+        <div class="heat-scale">Menos <span class="g"></span> Más</div>
+      </div>
+      <div class="panel">
+        <h3>Pedidos por día de la semana</h3>
+        <div class="chart"><canvas id="ch-dias" aria-label="Pedidos por día de la semana"></canvas></div>
+      </div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Ordenar el calendario comercial.</strong> Preparar stock y logística para Black Friday con semanas de anticipación, y concentrar mails y promociones de lunes a miércoles, en horario diurno, cuando la gente realmente compra.</p>
+    </div>
+  </section>
+
+  <!-- 4. Recontactar -->
+  <section class="block" id="recontactar">
+    <div class="sec-head">
+      <div class="eyebrow">Pregunta 4 de 4 · ¿Qué clientes dejaron de comprar y conviene recontactar?</div>
+      <h2 id="h-recontactar"></h2>
+      <p class="lead" id="t-recontactar"></p>
+    </div>
+    <div class="panel">
+      <h3>Clientes según su última compra</h3>
+      <div class="bar100" id="segmentos" style="height:44px"></div>
+      <div class="legend" id="leg-segmentos"></div>
+    </div>
+    <div class="grid2">
+      <div class="panel sim">
+        <h3>¿Cuánto valdría recuperarlos?</h3>
+        <label for="sim-pct">Si vuelve a comprar el <span id="sim-pct-out" class="num">10%</span> de los clientes a recontactar…</label>
+        <input type="range" id="sim-pct" min="1" max="30" value="10" step="1">
+        <div class="sim-out">
+          <div><span class="v num" id="sim-cli"></span><span class="l">clientes recuperados</span></div>
+          <div><span class="v num" id="sim-ing"></span><span class="l">ingresos extra con una compra cada uno</span></div>
+        </div>
+        <p class="note" id="sim-note"></p>
+      </div>
+      <div class="panel">
+        <h3>Cómo elegí a quién recontactar</h3>
+        <p class="sub">No todos los inactivos valen el esfuerzo. Me quedé con los que llevan más de 6 meses sin comprar y además cumplen al menos una condición:</p>
+        <div class="stack">
+          <div><span class="chip rec">Recurrente</span> compró 2 veces o más</div>
+          <div><span class="chip val">Alto valor</span> gastó R$ 300 o más</div>
+        </div>
+        <div class="facts" id="facts-recontactar" style="grid-template-columns:1fr 1fr"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div style="display:grid;gap:4px">
+          <h3>Lista priorizada para el equipo comercial</h3>
+          <p class="sub">Los 500 clientes inactivos de mayor gasto. Los identificadores son anónimos en el dataset original.</p>
+        </div>
+        <div class="filters">
+          <select id="f-estado" aria-label="Filtrar por estado"></select>
+          <select id="f-motivo" aria-label="Filtrar por motivo">
+            <option value="">Todos los motivos</option>
+            <option value="rec">Recurrentes</option>
+            <option value="val">Alto valor</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th><button type="button" data-sort="ultima_compra">Última compra <span></span></button></th>
+            <th class="r"><button type="button" data-sort="dias_sin_comprar">Días sin comprar <span></span></button></th>
+            <th class="r"><button type="button" data-sort="pedidos">Pedidos <span></span></button></th>
+            <th class="r"><button type="button" data-sort="gasto">Gasto total <span>↓</span></button></th>
+            <th>Motivo</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="panel-head">
+        <p class="note" id="t-count"></p>
+        <button type="button" class="more" id="more">Mostrar 15 más</button>
+      </div>
+    </div>
+    <div class="action">
+      <div class="tag">Qué haría</div>
+      <p><strong>Empezar la reactivación por arriba de esta lista.</strong> Una campaña personalizada a los clientes de mayor gasto, medida contra un grupo de control, dice en pocas semanas si vale la pena escalarla al resto.</p>
+    </div>
+  </section>
+
+  <!-- Método -->
+  <section class="block" id="metodo">
+    <div class="sec-head">
+      <div class="eyebrow">Cómo lo hice</div>
+      <h2>De seis archivos sueltos a respuestas de negocio</h2>
+      <p class="lead">El trabajo más grande fue organizar los datos: unir tablas, limpiar fechas, traducir categorías y definir reglas claras antes de contar nada.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">PASO 1</span><h3>Datos crudos</h3><p>6 archivos públicos de Olist: clientes, pedidos, productos, pagos y más. <span class="num">99.441</span> pedidos en total.</p></div>
+      <div class="step"><span class="n">PASO 2</span><h3>Limpieza</h3><p>Con Python y pandas: fechas, faltantes, categorías traducidas y todo cargado en una base de datos.</p></div>
+      <div class="step"><span class="n">PASO 3</span><h3>Consultas</h3><p>Con SQL: una consulta por pregunta de negocio, que cruza clientes, pedidos y productos.</p></div>
+      <div class="step"><span class="n">PASO 4</span><h3>Este tablero</h3><p>Un script que toma los resultados y arma esta página. Si cambian los datos, se regenera sola.</p></div>
+    </div>
+    <div class="panel">
+      <h3>Decisiones que tomé</h3>
+      <ul class="decisions">
+        <li><strong>Solo cuento pedidos entregados.</strong> Los cancelados o no disponibles no son ventas reales.</li>
+        <li><strong>Ingresos sin envío.</strong> Uso el precio de los productos, sin el costo de flete.</li>
+        <li><strong>Un cliente es una persona, no un pedido.</strong> El sistema de Olist asigna un código nuevo en cada compra; uso el identificador único de la persona para no contar dos veces al mismo cliente.</li>
+        <li><strong>"Inactivo" es más de 180 días sin comprar</strong>, medido desde la última fecha con ventas del dataset. Es un criterio ajustable.</li>
+      </ul>
+    </div>
+    <p>Código completo en <a href="https://github.com/Inaki-FSD/Analisis-Ventas" target="_blank" rel="noopener">github.com/Inaki-FSD/Analisis-Ventas</a>.</p>
+  </section>
+
+  <footer>
+    <p>Datos: Brazilian E-Commerce Public Dataset by Olist (Kaggle, licencia CC BY-NC-SA 4.0).</p>
+    <p>Montos en reales brasileños (R$). Período analizado: <span id="periodo"></span>.</p>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+const D = {"kpis": {"ingresos": 13221498.11, "pedidos": 96478, "clientes": 93358, "productos": 32216, "categorias": 74, "ticket_promedio": 137.04, "desde": "2016-09-15", "hasta": "2018-08-29"}, "deciles": [{"decil": 1, "clientes": 9336, "ingresos": 5434024.58, "pct_ingresos": 41.1}, {"decil": 2, "clientes": 9336, "ingresos": 2052212.48, "pct_ingresos": 15.52}, {"decil": 3, "clientes": 9336, "ingresos": 1462923.09, "pct_ingresos": 11.06}, {"decil": 4, "clientes": 9336, "ingresos": 1145909.82, "pct_ingresos": 8.67}, {"decil": 5, "clientes": 9336, "ingresos": 920254.29, "pct_ingresos": 6.96}, {"decil": 6, "clientes": 9336, "ingresos": 730177.31, "pct_ingresos": 5.52}, {"decil": 7, "clientes": 9336, "ingresos": 564365.95, "pct_ingresos": 4.27}, {"decil": 8, "clientes": 9336, "ingresos": 433902.45, "pct_ingresos": 3.28}, {"decil": 9, "clientes": 9335, "ingresos": 303650.24, "pct_ingresos": 2.3}, {"decil": 10, "clientes": 9335, "ingresos": 174077.9, "pct_ingresos": 1.32}], "recurrencia": [{"segmento": "1 pedido", "clientes": 90557, "pct_clientes": 97.0, "ingresos": 12493089.36, "pct_ingresos": 94.49}, {"segmento": "2 pedidos", "clientes": 2573, "pct_clientes": 2.76, "ingresos": 631274.9, "pct_ingresos": 4.77}, {"segmento": "3+ pedidos", "clientes": 228, "pct_clientes": 0.24, "ingresos": 97133.85, "pct_ingresos": 0.73}], "top_clientes": [{"customer_unique_id": "0a0a92112bd4c708ca5fde585afaa872", "estado": "RJ", "pedidos": 1, "gasto_total": 13440.0, "pct_del_total": 0.102, "id": "0a0a9211"}, {"customer_unique_id": "da122df9eeddfedc1dc1f5349a1a690c", "estado": "RJ", "pedidos": 2, "gasto_total": 7388.0, "pct_del_total": 0.056, "id": "da122df9"}, {"customer_unique_id": "763c8b1c9c68a0229c42c9fc6f662b93", "estado": "ES", "pedidos": 1, "gasto_total": 7160.0, "pct_del_total": 0.054, "id": "763c8b1c"}, {"customer_unique_id": "dc4802a71eae9be1dd28f5d788ceb526", "estado": "MS", "pedidos": 1, "gasto_total": 6735.0, "pct_del_total": 0.051, "id": "dc4802a7"}, {"customer_unique_id": "459bef486812aa25204be022145caa62", "estado": "ES", "pedidos": 1, "gasto_total": 6729.0, "pct_del_total": 0.051, "id": "459bef48"}, {"customer_unique_id": "ff4159b92c40ebe40454e3e6a7c35ed6", "estado": "SP", "pedidos": 1, "gasto_total": 6499.0, "pct_del_total": 0.049, "id": "ff4159b9"}, {"customer_unique_id": "4007669dec559734d6f53e029e360987", "estado": "MG", "pedidos": 1, "gasto_total": 5934.6, "pct_del_total": 0.045, "id": "4007669d"}, {"customer_unique_id": "eebb5dda148d3893cdaf5b5ca3040ccb", "estado": "SP", "pedidos": 1, "gasto_total": 4690.0, "pct_del_total": 0.035, "id": "eebb5dda"}, {"customer_unique_id": "48e1ac109decbb87765a3eade6854098", "estado": "PB", "pedidos": 1, "gasto_total": 4590.0, "pct_del_total": 0.035, "id": "48e1ac10"}, {"customer_unique_id": "a229eba70ec1c2abef51f04987deb7a5", "estado": "RJ", "pedidos": 1, "gasto_total": 4400.0, "pct_del_total": 0.033, "id": "a229eba7"}], "estados": [{"estado": "SP", "clientes": 39156, "ingresos": 5067633.16, "pct_ingresos": 38.33}, {"estado": "RJ", "clientes": 11917, "ingresos": 1759651.13, "pct_ingresos": 13.31}, {"estado": "MG", "clientes": 11001, "ingresos": 1552481.83, "pct_ingresos": 11.74}, {"estado": "RS", "clientes": 5168, "ingresos": 728897.47, "pct_ingresos": 5.51}, {"estado": "PR", "clientes": 4769, "ingresos": 666063.51, "pct_ingresos": 5.04}, {"estado": "SC", "clientes": 3449, "ingresos": 507012.13, "pct_ingresos": 3.83}, {"estado": "BA", "clientes": 3158, "ingresos": 493584.14, "pct_ingresos": 3.73}, {"estado": "DF", "clientes": 2019, "ingresos": 296498.41, "pct_ingresos": 2.24}, {"estado": "GO", "clientes": 1895, "ingresos": 282836.7, "pct_ingresos": 2.14}, {"estado": "ES", "clientes": 1928, "ingresos": 268643.45, "pct_ingresos": 2.03}, {"estado": "PE", "clientes": 1551, "ingresos": 251889.49, "pct_ingresos": 1.91}, {"estado": "CE", "clientes": 1258, "ingresos": 219757.38, "pct_ingresos": 1.66}, {"estado": "PA", "clientes": 922, "ingresos": 174470.59, "pct_ingresos": 1.32}, {"estado": "MT", "clientes": 856, "ingresos": 152191.62, "pct_ingresos": 1.15}, {"estado": "MA", "clientes": 700, "ingresos": 117009.38, "pct_ingresos": 0.88}, {"estado": "MS", "clientes": 681, "ingresos": 115429.97, "pct_ingresos": 0.87}, {"estado": "PB", "clientes": 504, "ingresos": 112586.82, "pct_ingresos": 0.85}, {"estado": "PI", "clientes": 464, "ingresos": 84721.0, "pct_ingresos": 0.64}, {"estado": "RN", "clientes": 464, "ingresos": 82105.66, "pct_ingresos": 0.62}, {"estado": "AL", "clientes": 387, "ingresos": 78855.72, "pct_ingresos": 0.6}, {"estado": "SE", "clientes": 329, "ingresos": 56574.19, "pct_ingresos": 0.43}, {"estado": "TO", "clientes": 267, "ingresos": 48402.51, "pct_ingresos": 0.37}, {"estado": "RO", "clientes": 231, "ingresos": 45682.76, "pct_ingresos": 0.35}, {"estado": "AM", "clientes": 140, "ingresos": 22155.84, "pct_ingresos": 0.17}, {"estado": "AC", "clientes": 76, "ingresos": 15930.97, "pct_ingresos": 0.12}, {"estado": "AP", "clientes": 66, "ingresos": 13374.81, "pct_ingresos": 0.1}, {"estado": "RR", "clientes": 40, "ingresos": 7057.47, "pct_ingresos": 0.05}], "categorias": [{"nombre": "Salud y belleza", "unidades": 9465, "ingresos": 1233131.72}, {"nombre": "Relojes y regalos", "unidades": 5859, "ingresos": 1166176.98}, {"nombre": "Cama, baño y mesa", "unidades": 10953, "ingresos": 1023434.76}, {"nombre": "Deportes y ocio", "unidades": 8431, "ingresos": 954852.55}, {"nombre": "Accesorios de computación", "unidades": 7644, "ingresos": 888724.61}, {"nombre": "Muebles y decoración", "unidades": 8160, "ingresos": 711927.69}, {"nombre": "Artículos para el hogar", "unidades": 6795, "ingresos": 615628.69}, {"nombre": "Novedades", "unidades": 3718, "ingresos": 610204.1}, {"nombre": "Automotor", "unidades": 4140, "ingresos": 578966.65}, {"nombre": "Juguetes", "unidades": 4030, "ingresos": 471286.48}, {"nombre": "Jardinería", "unidades": 4268, "ingresos": 470495.28}, {"nombre": "Bebés", "unidades": 2982, "ingresos": 400421.84}, {"nombre": "Perfumería", "unidades": 3340, "ingresos": 390144.65}, {"nombre": "Telefonía", "unidades": 4430, "ingresos": 309860.23}, {"nombre": "Muebles de oficina", "unidades": 1668, "ingresos": 268154.31}, {"nombre": "Librería", "unidades": 2466, "ingresos": 223788.69}, {"nombre": "Computadoras", "unidades": 199, "ingresos": 218684.14}, {"nombre": "Mascotas", "unidades": 1924, "ingresos": 211695.64}, {"nombre": "Instrumentos musicales", "unidades": 651, "ingresos": 184315.74}, {"nombre": "Pequeños electrodomésticos", "unidades": 658, "ingresos": 182754.12}, {"nombre": "Sin categoría", "unidades": 1537, "ingresos": 170726.63}, {"nombre": "Electrónica", "unidades": 2729, "ingresos": 155043.93}, {"nombre": "Bolsos y accesorios", "unidades": 1985, "ingresos": 149329.39}, {"nombre": "Consolas y videojuegos", "unidades": 1089, "ingresos": 148003.37}, {"nombre": "Herramientas de construcción", "unidades": 916, "ingresos": 142108.49}, {"nombre": "Valijas y viaje", "unidades": 1077, "ingresos": 138701.63}, {"nombre": "Electrodomésticos II", "unidades": 231, "ingresos": 107953.95}, {"nombre": "Construcción del hogar", "unidades": 596, "ingresos": 81407.57}, {"nombre": "Electrodomésticos", "unidades": 754, "ingresos": 78832.48}, {"nombre": "Agro, industria y comercio", "unidades": 206, "ingresos": 70566.1}, {"nombre": "Muebles de living", "unidades": 495, "ingresos": 67350.7}, {"nombre": "Confort del hogar", "unidades": 429, "ingresos": 58008.45}, {"nombre": "Telefonía fija", "unidades": 255, "ingresos": 55315.21}, {"nombre": "Aire acondicionado", "unidades": 289, "ingresos": 53323.56}, {"nombre": "Audio", "unidades": 362, "ingresos": 50570.6}, {"nombre": "Hornos y cafeteras", "unidades": 73, "ingresos": 46589.56}, {"nombre": "Muebles de cocina y jardín", "unidades": 274, "ingresos": 45531.98}, {"nombre": "Libros de interés general", "unidades": 537, "ingresos": 45302.15}, {"nombre": "Iluminación", "unidades": 301, "ingresos": 39957.0}, {"nombre": "Seguridad para obra", "unidades": 183, "ingresos": 38773.22}, {"nombre": "Industria y negocios", "unidades": 265, "ingresos": 38498.81}, {"nombre": "Alimentos", "unidades": 499, "ingresos": 28731.15}, {"nombre": "Marketplace", "unidades": 305, "ingresos": 27795.77}, {"nombre": "Herramientas de jardín", "unidades": 232, "ingresos": 25096.28}, {"nombre": "Arte", "unidades": 197, "ingresos": 23657.3}, {"nombre": "Calzado", "unidades": 257, "ingresos": 23001.46}, {"nombre": "Bebidas", "unidades": 361, "ingresos": 21529.84}, {"nombre": "Señalización y seguridad", "unidades": 197, "ingresos": 21315.05}, {"nombre": "Muebles de dormitorio", "unidades": 103, "ingresos": 19051.8}, {"nombre": "Libros técnicos", "unidades": 263, "ingresos": 18702.23}, {"nombre": "Herramientas", "unidades": 103, "ingresos": 15903.95}, {"nombre": "Comidas y bebidas", "unidades": 269, "ingresos": 14942.88}, {"nombre": "Ropa de hombre", "unidades": 125, "ingresos": 10452.33}, {"nombre": "Ropa interior y playa", "unidades": 127, "ingresos": 9305.95}, {"nombre": "Navidad", "unidades": 150, "ingresos": 8737.84}, {"nombre": "Tablets e impresión", "unidades": 83, "ingresos": 7528.41}, {"nombre": "Cine y foto", "unidades": 70, "ingresos": 6674.47}, {"nombre": "Música", "unidades": 38, "ingresos": 6034.35}, {"nombre": "DVD y Blu-ray", "unidades": 61, "ingresos": 4542.59}, {"nombre": "Cotillón", "unidades": 42, "ingresos": 4465.19}, {"nombre": "Libros importados", "unidades": 57, "ingresos": 4418.86}, {"nombre": "Colchones y tapizados", "unidades": 37, "ingresos": 4323.38}, {"nombre": "Procesadoras de cocina", "unidades": 14, "ingresos": 3933.63}, {"nombre": "Ropa de mujer", "unidades": 45, "ingresos": 2634.94}, {"nombre": "Ropa deportiva", "unidades": 29, "ingresos": 2094.52}, {"nombre": "Cocina gourmet", "unidades": 14, "ingresos": 2054.99}, {"nombre": "Artesanías", "unidades": 24, "ingresos": 1814.01}, {"nombre": "Pañales e higiene", "unidades": 37, "ingresos": 1500.79}, {"nombre": "PC gamer", "unidades": 8, "ingresos": 1306.95}, {"nombre": "Flores", "unidades": 33, "ingresos": 1110.04}, {"nombre": "Confort del hogar II", "unidades": 30, "ingresos": 760.27}, {"nombre": "CDs y musicales", "unidades": 14, "ingresos": 730.0}, {"nombre": "Ropa infantil", "unidades": 7, "ingresos": 519.95}, {"nombre": "Seguridad y servicios", "unidades": 2, "ingresos": 283.29}], "rotacion": [{"rango_ventas": "1 unidad", "productos": 17716, "pct_productos": 54.99, "unidades_totales": 17716.0}, {"rango_ventas": "2-5 unidades", "productos": 10741, "pct_productos": 33.34, "unidades_totales": 29992.0}, {"rango_ventas": "6-20 unidades", "productos": 3108, "pct_productos": 9.65, "unidades_totales": 29884.0}, {"rango_ventas": "más de 20", "productos": 651, "pct_productos": 2.02, "unidades_totales": 32605.0}], "mensual": [{"mes": "2017-01", "pedidos": 750, "ingresos": 111798.36}, {"mes": "2017-02", "pedidos": 1653, "ingresos": 234223.4}, {"mes": "2017-03", "pedidos": 2546, "ingresos": 359198.85}, {"mes": "2017-04", "pedidos": 2303, "ingresos": 340669.68}, {"mes": "2017-05", "pedidos": 3546, "ingresos": 489338.25}, {"mes": "2017-06", "pedidos": 3135, "ingresos": 421923.37}, {"mes": "2017-07", "pedidos": 3872, "ingresos": 481604.52}, {"mes": "2017-08", "pedidos": 4193, "ingresos": 554699.7}, {"mes": "2017-09", "pedidos": 4150, "ingresos": 607399.67}, {"mes": "2017-10", "pedidos": 4478, "ingresos": 648247.65}, {"mes": "2017-11", "pedidos": 7289, "ingresos": 987765.37}, {"mes": "2017-12", "pedidos": 5513, "ingresos": 726033.19}, {"mes": "2018-01", "pedidos": 7069, "ingresos": 924645.0}, {"mes": "2018-02", "pedidos": 6555, "ingresos": 826437.13}, {"mes": "2018-03", "pedidos": 7003, "ingresos": 953356.25}, {"mes": "2018-04", "pedidos": 6798, "ingresos": 973534.09}, {"mes": "2018-05", "pedidos": 6749, "ingresos": 977544.69}, {"mes": "2018-06", "pedidos": 6099, "ingresos": 856077.86}, {"mes": "2018-07", "pedidos": 6159, "ingresos": 867953.46}, {"mes": "2018-08", "pedidos": 6351, "ingresos": 838576.64}], "dia_semana": [{"dia_semana": 0, "pedidos": 11635, "ingresos": 1545648.06}, {"dia_semana": 1, "pedidos": 15701, "ingresos": 2168905.61}, {"dia_semana": 2, "pedidos": 15503, "ingresos": 2122264.52}, {"dia_semana": 3, "pedidos": 15076, "ingresos": 2051533.71}, {"dia_semana": 4, "pedidos": 14323, "ingresos": 1958600.49}, {"dia_semana": 5, "pedidos": 13685, "ingresos": 1910496.12}, {"dia_semana": 6, "pedidos": 10555, "ingresos": 1464049.6}], "heatmap": [{"dia_semana": 0, "hora": 0, "pedidos": 256}, {"dia_semana": 0, "hora": 1, "pedidos": 137}, {"dia_semana": 0, "hora": 2, "pedidos": 68}, {"dia_semana": 0, "hora": 3, "pedidos": 41}, {"dia_semana": 0, "hora": 4, "pedidos": 27}, {"dia_semana": 0, "hora": 5, "pedidos": 26}, {"dia_semana": 0, "hora": 6, "pedidos": 30}, {"dia_semana": 0, "hora": 7, "pedidos": 102}, {"dia_semana": 0, "hora": 8, "pedidos": 202}, {"dia_semana": 0, "hora": 9, "pedidos": 341}, {"dia_semana": 0, "hora": 10, "pedidos": 513}, {"dia_semana": 0, "hora": 11, "pedidos": 705}, {"dia_semana": 0, "hora": 12, "pedidos": 653}, {"dia_semana": 0, "hora": 13, "pedidos": 701}, {"dia_semana": 0, "hora": 14, "pedidos": 660}, {"dia_semana": 0, "hora": 15, "pedidos": 696}, {"dia_semana": 0, "hora": 16, "pedidos": 688}, {"dia_semana": 0, "hora": 17, "pedidos": 777}, {"dia_semana": 0, "hora": 18, "pedidos": 875}, {"dia_semana": 0, "hora": 19, "pedidos": 881}, {"dia_semana": 0, "hora": 20, "pedidos": 944}, {"dia_semana": 0, "hora": 21, "pedidos": 863}, {"dia_semana": 0, "hora": 22, "pedidos": 858}, {"dia_semana": 0, "hora": 23, "pedidos": 591}, {"dia_semana": 1, "hora": 0, "pedidos": 315}, {"dia_semana": 1, "hora": 1, "pedidos": 132}, {"dia_semana": 1, "hora": 2, "pedidos": 63}, {"dia_semana": 1, "hora": 3, "pedidos": 34}, {"dia_semana": 1, "hora": 4, "pedidos": 21}, {"dia_semana": 1, "hora": 5, "pedidos": 22}, {"dia_semana": 1, "hora": 6, "pedidos": 64}, {"dia_semana": 1, "hora": 7, "pedidos": 157}, {"dia_semana": 1, "hora": 8, "pedidos": 471}, {"dia_semana": 1, "hora": 9, "pedidos": 752}, {"dia_semana": 1, "hora": 10, "pedidos": 999}, {"dia_semana": 1, "hora": 11, "pedidos": 1052}, {"dia_semana": 1, "hora": 12, "pedidos": 944}, {"dia_semana": 1, "hora": 13, "pedidos": 1000}, {"dia_semana": 1, "hora": 14, "pedidos": 1063}, {"dia_semana": 1, "hora": 15, "pedidos": 1047}, {"dia_semana": 1, "hora": 16, "pedidos": 1060}, {"dia_semana": 1, "hora": 17, "pedidos": 954}, {"dia_semana": 1, "hora": 18, "pedidos": 891}, {"dia_semana": 1, "hora": 19, "pedidos": 920}, {"dia_semana": 1, "hora": 20, "pedidos": 998}, {"dia_semana": 1, "hora": 21, "pedidos": 1083}, {"dia_semana": 1, "hora": 22, "pedidos": 962}, {"dia_semana": 1, "hora": 23, "pedidos": 697}, {"dia_semana": 2, "hora": 0, "pedidos": 300}, {"dia_semana": 2, "hora": 1, "pedidos": 151}, {"dia_semana": 2, "hora": 2, "pedidos": 79}, {"dia_semana": 2, "hora": 3, "pedidos": 28}, {"dia_semana": 2, "hora": 4, "pedidos": 28}, {"dia_semana": 2, "hora": 5, "pedidos": 24}, {"dia_semana": 2, "hora": 6, "pedidos": 69}, {"dia_semana": 2, "hora": 7, "pedidos": 216}, {"dia_semana": 2, "hora": 8, "pedidos": 510}, {"dia_semana": 2, "hora": 9, "pedidos": 845}, {"dia_semana": 2, "hora": 10, "pedidos": 940}, {"dia_semana": 2, "hora": 11, "pedidos": 1023}, {"dia_semana": 2, "hora": 12, "pedidos": 874}, {"dia_semana": 2, "hora": 13, "pedidos": 1011}, {"dia_semana": 2, "hora": 14, "pedidos": 1095}, {"dia_semana": 2, "hora": 15, "pedidos": 1005}, {"dia_semana": 2, "hora": 16, "pedidos": 1059}, {"dia_semana": 2, "hora": 17, "pedidos": 943}, {"dia_semana": 2, "hora": 18, "pedidos": 852}, {"dia_semana": 2, "hora": 19, "pedidos": 894}, {"dia_semana": 2, "hora": 20, "pedidos": 946}, {"dia_semana": 2, "hora": 21, "pedidos": 996}, {"dia_semana": 2, "hora": 22, "pedidos": 939}, {"dia_semana": 2, "hora": 23, "pedidos": 676}, {"dia_semana": 3, "hora": 0, "pedidos": 385}, {"dia_semana": 3, "hora": 1, "pedidos": 171}, {"dia_semana": 3, "hora": 2, "pedidos": 81}, {"dia_semana": 3, "hora": 3, "pedidos": 31}, {"dia_semana": 3, "hora": 4, "pedidos": 33}, {"dia_semana": 3, "hora": 5, "pedidos": 24}, {"dia_semana": 3, "hora": 6, "pedidos": 91}, {"dia_semana": 3, "hora": 7, "pedidos": 208}, {"dia_semana": 3, "hora": 8, "pedidos": 497}, {"dia_semana": 3, "hora": 9, "pedidos": 798}, {"dia_semana": 3, "hora": 10, "pedidos": 1007}, {"dia_semana": 3, "hora": 11, "pedidos": 1030}, {"dia_semana": 3, "hora": 12, "pedidos": 897}, {"dia_semana": 3, "hora": 13, "pedidos": 990}, {"dia_semana": 3, "hora": 14, "pedidos": 1027}, {"dia_semana": 3, "hora": 15, "pedidos": 952}, {"dia_semana": 3, "hora": 16, "pedidos": 1008}, {"dia_semana": 3, "hora": 17, "pedidos": 943}, {"dia_semana": 3, "hora": 18, "pedidos": 818}, {"dia_semana": 3, "hora": 19, "pedidos": 822}, {"dia_semana": 3, "hora": 20, "pedidos": 881}, {"dia_semana": 3, "hora": 21, "pedidos": 927}, {"dia_semana": 3, "hora": 22, "pedidos": 855}, {"dia_semana": 3, "hora": 23, "pedidos": 600}, {"dia_semana": 4, "hora": 0, "pedidos": 345}, {"dia_semana": 4, "hora": 1, "pedidos": 165}, {"dia_semana": 4, "hora": 2, "pedidos": 74}, {"dia_semana": 4, "hora": 3, "pedidos": 38}, {"dia_semana": 4, "hora": 4, "pedidos": 30}, {"dia_semana": 4, "hora": 5, "pedidos": 28}, {"dia_semana": 4, "hora": 6, "pedidos": 82}, {"dia_semana": 4, "hora": 7, "pedidos": 211}, {"dia_semana": 4, "hora": 8, "pedidos": 495}, {"dia_semana": 4, "hora": 9, "pedidos": 736}, {"dia_semana": 4, "hora": 10, "pedidos": 956}, {"dia_semana": 4, "hora": 11, "pedidos": 928}, {"dia_semana": 4, "hora": 12, "pedidos": 940}, {"dia_semana": 4, "hora": 13, "pedidos": 953}, {"dia_semana": 4, "hora": 14, "pedidos": 951}, {"dia_semana": 4, "hora": 15, "pedidos": 901}, {"dia_semana": 4, "hora": 16, "pedidos": 1042}, {"dia_semana": 4, "hora": 17, "pedidos": 881}, {"dia_semana": 4, "hora": 18, "pedidos": 759}, {"dia_semana": 4, "hora": 19, "pedidos": 798}, {"dia_semana": 4, "hora": 20, "pedidos": 816}, {"dia_semana": 4, "hora": 21, "pedidos": 826}, {"dia_semana": 4, "hora": 22, "pedidos": 835}, {"dia_semana": 4, "hora": 23, "pedidos": 533}, {"dia_semana": 5, "hora": 0, "pedidos": 412}, {"dia_semana": 5, "hora": 1, "pedidos": 210}, {"dia_semana": 5, "hora": 2, "pedidos": 66}, {"dia_semana": 5, "hora": 3, "pedidos": 46}, {"dia_semana": 5, "hora": 4, "pedidos": 39}, {"dia_semana": 5, "hora": 5, "pedidos": 35}, {"dia_semana": 5, "hora": 6, "pedidos": 91}, {"dia_semana": 5, "hora": 7, "pedidos": 203}, {"dia_semana": 5, "hora": 8, "pedidos": 487}, {"dia_semana": 5, "hora": 9, "pedidos": 754}, {"dia_semana": 5, "hora": 10, "pedidos": 928}, {"dia_semana": 5, "hora": 11, "pedidos": 960}, {"dia_semana": 5, "hora": 12, "pedidos": 828}, {"dia_semana": 5, "hora": 13, "pedidos": 968}, {"dia_semana": 5, "hora": 14, "pedidos": 937}, {"dia_semana": 5, "hora": 15, "pedidos": 948}, {"dia_semana": 5, "hora": 16, "pedidos": 943}, {"dia_semana": 5, "hora": 17, "pedidos": 791}, {"dia_semana": 5, "hora": 18, "pedidos": 697}, {"dia_semana": 5, "hora": 19, "pedidos": 757}, {"dia_semana": 5, "hora": 20, "pedidos": 714}, {"dia_semana": 5, "hora": 21, "pedidos": 700}, {"dia_semana": 5, "hora": 22, "pedidos": 675}, {"dia_semana": 5, "hora": 23, "pedidos": 496}, {"dia_semana": 6, "hora": 0, "pedidos": 308}, {"dia_semana": 6, "hora": 1, "pedidos": 167}, {"dia_semana": 6, "hora": 2, "pedidos": 65}, {"dia_semana": 6, "hora": 3, "pedidos": 41}, {"dia_semana": 6, "hora": 4, "pedidos": 25}, {"dia_semana": 6, "hora": 5, "pedidos": 23}, {"dia_semana": 6, "hora": 6, "pedidos": 51}, {"dia_semana": 6, "hora": 7, "pedidos": 102}, {"dia_semana": 6, "hora": 8, "pedidos": 245}, {"dia_semana": 6, "hora": 9, "pedidos": 421}, {"dia_semana": 6, "hora": 10, "pedidos": 635}, {"dia_semana": 6, "hora": 11, "pedidos": 687}, {"dia_semana": 6, "hora": 12, "pedidos": 667}, {"dia_semana": 6, "hora": 13, "pedidos": 686}, {"dia_semana": 6, "hora": 14, "pedidos": 650}, {"dia_semana": 6, "hora": 15, "pedidos": 700}, {"dia_semana": 6, "hora": 16, "pedidos": 676}, {"dia_semana": 6, "hora": 17, "pedidos": 674}, {"dia_semana": 6, "hora": 18, "pedidos": 693}, {"dia_semana": 6, "hora": 19, "pedidos": 729}, {"dia_semana": 6, "hora": 20, "pedidos": 708}, {"dia_semana": 6, "hora": 21, "pedidos": 645}, {"dia_semana": 6, "hora": 22, "pedidos": 535}, {"dia_semana": 6, "hora": 23, "pedidos": 422}], "mejores_dias": [{"dia": "2017-11-24", "pedidos": 1147, "ingresos": 149916.58}, {"dia": "2017-11-25", "pedidos": 487, "ingresos": 59928.51}, {"dia": "2018-05-16", "pedidos": 351, "ingresos": 55562.13}, {"dia": "2018-08-06", "pedidos": 363, "ingresos": 53475.41}, {"dia": "2018-05-07", "pedidos": 363, "ingresos": 52726.03}], "segmentos": [{"estado_cliente": "1. Activo (0-90 días)", "clientes": 18520, "pct_clientes": 19.84, "gasto_historico": 2647037.46}, {"estado_cliente": "2. En riesgo (91-180 días)", "clientes": 19706, "pct_clientes": 21.11, "gasto_historico": 2870649.04}, {"estado_cliente": "3. Inactivo (+180 días)", "clientes": 55132, "pct_clientes": 59.05, "gasto_historico": 7703811.61}], "recontactar": {"clientes": 5888, "gasto_historico": 3088144.42, "ticket_promedio": 407.3}, "lista": [{"id": "0a0a9211", "estado": "RJ", "ultima_compra": "2017-09-29", "dias_sin_comprar": 334, "pedidos": 1, "gasto": 13440.0}, {"id": "da122df9", "estado": "RJ", "ultima_compra": "2017-04-01", "dias_sin_comprar": 515, "pedidos": 2, "gasto": 7388.0}, {"id": "dc4802a7", "estado": "MS", "ultima_compra": "2017-02-12", "dias_sin_comprar": 563, "pedidos": 1, "gasto": 6735.0}, {"id": "ff4159b9", "estado": "SP", "ultima_compra": "2017-05-24", "dias_sin_comprar": 462, "pedidos": 1, "gasto": 6499.0}, {"id": "4007669d", "estado": "MG", "ultima_compra": "2017-11-24", "dias_sin_comprar": 278, "pedidos": 1, "gasto": 5934.6}, {"id": "eebb5dda", "estado": "SP", "ultima_compra": "2017-04-18", "dias_sin_comprar": 498, "pedidos": 1, "gasto": 4690.0}, {"id": "011875f0", "estado": "SP", "ultima_compra": "2017-03-18", "dias_sin_comprar": 529, "pedidos": 1, "gasto": 3999.9}, {"id": "edf81e1f", "estado": "DF", "ultima_compra": "2017-04-18", "dias_sin_comprar": 498, "pedidos": 1, "gasto": 3999.0}, {"id": "5e713be0", "estado": "PA", "ultima_compra": "2017-02-04", "dias_sin_comprar": 571, "pedidos": 1, "gasto": 3980.0}, {"id": "5d09b0d8", "estado": "DF", "ultima_compra": "2017-02-10", "dias_sin_comprar": 565, "pedidos": 1, "gasto": 3699.99}, {"id": "bc5e2509", "estado": "MG", "ultima_compra": "2018-01-26", "dias_sin_comprar": 215, "pedidos": 1, "gasto": 3690.0}, {"id": "931eabdf", "estado": "SC", "ultima_compra": "2017-05-10", "dias_sin_comprar": 476, "pedidos": 1, "gasto": 3597.0}, {"id": "03796b63", "estado": "DF", "ultima_compra": "2017-02-21", "dias_sin_comprar": 554, "pedidos": 1, "gasto": 3549.0}, {"id": "59d66d72", "estado": "SP", "ultima_compra": "2017-08-10", "dias_sin_comprar": 384, "pedidos": 2, "gasto": 3459.0}, {"id": "76a08544", "estado": "BA", "ultima_compra": "2018-02-11", "dias_sin_comprar": 199, "pedidos": 1, "gasto": 3300.0}, {"id": "7a96eb0a", "estado": "RS", "ultima_compra": "2017-12-17", "dias_sin_comprar": 255, "pedidos": 1, "gasto": 3124.0}, {"id": "53fb3435", "estado": "MG", "ultima_compra": "2018-02-09", "dias_sin_comprar": 201, "pedidos": 1, "gasto": 3099.9}, {"id": "895617ab", "estado": "PR", "ultima_compra": "2017-10-05", "dias_sin_comprar": 328, "pedidos": 1, "gasto": 2999.99}, {"id": "c6111f70", "estado": "RJ", "ultima_compra": "2017-10-10", "dias_sin_comprar": 323, "pedidos": 1, "gasto": 2999.99}, {"id": "0f75637a", "estado": "MS", "ultima_compra": "2017-03-08", "dias_sin_comprar": 539, "pedidos": 1, "gasto": 2999.89}, {"id": "2ae8173a", "estado": "MG", "ultima_compra": "2017-03-20", "dias_sin_comprar": 527, "pedidos": 1, "gasto": 2999.89}, {"id": "6172bd5b", "estado": "RJ", "ultima_compra": "2017-07-06", "dias_sin_comprar": 419, "pedidos": 1, "gasto": 2999.89}, {"id": "ea984b06", "estado": "SP", "ultima_compra": "2017-03-27", "dias_sin_comprar": 520, "pedidos": 1, "gasto": 2999.89}, {"id": "ff0ae986", "estado": "BA", "ultima_compra": "2017-06-05", "dias_sin_comprar": 450, "pedidos": 1, "gasto": 2999.89}, {"id": "ee2bb06c", "estado": "SP", "ultima_compra": "2017-01-31", "dias_sin_comprar": 575, "pedidos": 1, "gasto": 2999.0}, {"id": "6f00d356", "estado": "PE", "ultima_compra": "2017-11-20", "dias_sin_comprar": 282, "pedidos": 1, "gasto": 2990.0}, {"id": "ae04948a", "estado": "BA", "ultima_compra": "2017-04-05", "dias_sin_comprar": 511, "pedidos": 1, "gasto": 2951.0}, {"id": "d9f8d6be", "estado": "SP", "ultima_compra": "2017-11-20", "dias_sin_comprar": 282, "pedidos": 1, "gasto": 2899.0}, {"id": "5599df2e", "estado": "SP", "ultima_compra": "2017-10-31", "dias_sin_comprar": 302, "pedidos": 1, "gasto": 2874.0}, {"id": "c21e93b1", "estado": "PR", "ultima_compra": "2017-05-16", "dias_sin_comprar": 470, "pedidos": 1, "gasto": 2799.0}, {"id": "030a810e", "estado": "GO", "ultima_compra": "2017-05-09", "dias_sin_comprar": 477, "pedidos": 1, "gasto": 2740.0}, {"id": "0de97ff6", "estado": "SP", "ultima_compra": "2017-12-02", "dias_sin_comprar": 270, "pedidos": 1, "gasto": 2700.0}, {"id": "ec5d2f91", "estado": "MG", "ultima_compra": "2017-11-27", "dias_sin_comprar": 275, "pedidos": 1, "gasto": 2700.0}, {"id": "149b43a4", "estado": "CE", "ultima_compra": "2017-06-18", "dias_sin_comprar": 437, "pedidos": 1, "gasto": 2690.0}, {"id": "1e7097be", "estado": "RJ", "ultima_compra": "2017-04-06", "dias_sin_comprar": 510, "pedidos": 1, "gasto": 2690.0}, {"id": "fc54c2c0", "estado": "BA", "ultima_compra": "2017-12-15", "dias_sin_comprar": 257, "pedidos": 1, "gasto": 2680.0}, {"id": "13d9920a", "estado": "RJ", "ultima_compra": "2017-12-21", "dias_sin_comprar": 251, "pedidos": 1, "gasto": 2649.99}, {"id": "81d8bf17", "estado": "TO", "ultima_compra": "2017-06-26", "dias_sin_comprar": 429, "pedidos": 1, "gasto": 2649.99}, {"id": "bb149f7e", "estado": "SP", "ultima_compra": "2017-06-05", "dias_sin_comprar": 450, "pedidos": 1, "gasto": 2649.0}, {"id": "c949c73b", "estado": "SP", "ultima_compra": "2017-06-02", "dias_sin_comprar": 453, "pedidos": 1, "gasto": 2649.0}, {"id": "7814db11", "estado": "SP", "ultima_compra": "2017-04-06", "dias_sin_comprar": 510, "pedidos": 1, "gasto": 2589.0}, {"id": "69e4e534", "estado": "MG", "ultima_compra": "2017-06-25", "dias_sin_comprar": 430, "pedidos": 1, "gasto": 2499.99}, {"id": "d8f1c3ed", "estado": "RJ", "ultima_compra": "2017-03-18", "dias_sin_comprar": 529, "pedidos": 1, "gasto": 2498.0}, {"id": "24c0598e", "estado": "RJ", "ultima_compra": "2017-11-24", "dias_sin_comprar": 278, "pedidos": 1, "gasto": 2400.0}, {"id": "d3ef55d6", "estado": "RO", "ultima_compra": "2017-11-30", "dias_sin_comprar": 272, "pedidos": 1, "gasto": 2400.0}, {"id": "d77aa958", "estado": "BA", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 2, "gasto": 2400.0}, {"id": "84056c11", "estado": "MT", "ultima_compra": "2017-07-28", "dias_sin_comprar": 397, "pedidos": 1, "gasto": 2399.8}, {"id": "5dff3703", "estado": "SP", "ultima_compra": "2017-10-28", "dias_sin_comprar": 305, "pedidos": 1, "gasto": 2399.0}, {"id": "98133dfc", "estado": "MG", "ultima_compra": "2017-11-25", "dias_sin_comprar": 277, "pedidos": 1, "gasto": 2399.0}, {"id": "e3e0e911", "estado": "SP", "ultima_compra": "2018-02-27", "dias_sin_comprar": 183, "pedidos": 1, "gasto": 2288.0}, {"id": "ec4b05ce", "estado": "PR", "ultima_compra": "2017-05-06", "dias_sin_comprar": 480, "pedidos": 1, "gasto": 2249.0}, {"id": "86df00dc", "estado": "RS", "ultima_compra": "2017-10-13", "dias_sin_comprar": 320, "pedidos": 3, "gasto": 2200.0}, {"id": "8bce6306", "estado": "PB", "ultima_compra": "2017-03-31", "dias_sin_comprar": 516, "pedidos": 1, "gasto": 2200.0}, {"id": "bd871765", "estado": "RS", "ultima_compra": "2017-01-30", "dias_sin_comprar": 576, "pedidos": 1, "gasto": 2199.99}, {"id": "352edc42", "estado": "RJ", "ultima_compra": "2017-12-22", "dias_sin_comprar": 250, "pedidos": 1, "gasto": 2199.0}, {"id": "c53a1525", "estado": "MA", "ultima_compra": "2017-11-20", "dias_sin_comprar": 282, "pedidos": 1, "gasto": 2199.0}, {"id": "03adb960", "estado": "AL", "ultima_compra": "2017-08-13", "dias_sin_comprar": 381, "pedidos": 1, "gasto": 2159.98}, {"id": "25d6024f", "estado": "SC", "ultima_compra": "2017-03-13", "dias_sin_comprar": 534, "pedidos": 1, "gasto": 2130.0}, {"id": "669e4413", "estado": "RJ", "ultima_compra": "2017-03-23", "dias_sin_comprar": 524, "pedidos": 1, "gasto": 2120.39}, {"id": "c77dde0f", "estado": "RJ", "ultima_compra": "2018-01-07", "dias_sin_comprar": 234, "pedidos": 1, "gasto": 2110.0}, {"id": "cad51aa0", "estado": "RJ", "ultima_compra": "2017-05-17", "dias_sin_comprar": 469, "pedidos": 1, "gasto": 2109.9}, {"id": "575fa0cb", "estado": "SC", "ultima_compra": "2017-08-09", "dias_sin_comprar": 385, "pedidos": 1, "gasto": 2096.94}, {"id": "00adeda9", "estado": "SP", "ultima_compra": "2017-11-07", "dias_sin_comprar": 295, "pedidos": 1, "gasto": 2078.5}, {"id": "46e8adbe", "estado": "RS", "ultima_compra": "2017-11-16", "dias_sin_comprar": 286, "pedidos": 1, "gasto": 2029.0}, {"id": "59bfe97a", "estado": "BA", "ultima_compra": "2018-01-24", "dias_sin_comprar": 217, "pedidos": 1, "gasto": 2029.0}, {"id": "73601b1e", "estado": "MG", "ultima_compra": "2017-11-01", "dias_sin_comprar": 301, "pedidos": 2, "gasto": 2009.98}, {"id": "c402f431", "estado": "SP", "ultima_compra": "2018-02-22", "dias_sin_comprar": 188, "pedidos": 1, "gasto": 2000.0}, {"id": "03d1be27", "estado": "SP", "ultima_compra": "2017-06-16", "dias_sin_comprar": 439, "pedidos": 1, "gasto": 1999.99}, {"id": "055ec572", "estado": "SP", "ultima_compra": "2017-07-18", "dias_sin_comprar": 407, "pedidos": 1, "gasto": 1999.99}, {"id": "18d3c0c7", "estado": "BA", "ultima_compra": "2017-06-19", "dias_sin_comprar": 436, "pedidos": 1, "gasto": 1999.99}, {"id": "4c4645e7", "estado": "SP", "ultima_compra": "2017-06-17", "dias_sin_comprar": 438, "pedidos": 1, "gasto": 1999.99}, {"id": "5330670c", "estado": "RJ", "ultima_compra": "2017-07-18", "dias_sin_comprar": 407, "pedidos": 1, "gasto": 1999.99}, {"id": "6ead799d", "estado": "SP", "ultima_compra": "2017-06-18", "dias_sin_comprar": 437, "pedidos": 1, "gasto": 1999.99}, {"id": "a5854c79", "estado": "RJ", "ultima_compra": "2017-06-18", "dias_sin_comprar": 437, "pedidos": 1, "gasto": 1999.99}, {"id": "af366f48", "estado": "BA", "ultima_compra": "2017-06-14", "dias_sin_comprar": 441, "pedidos": 1, "gasto": 1999.99}, {"id": "af4add6a", "estado": "SP", "ultima_compra": "2017-06-14", "dias_sin_comprar": 441, "pedidos": 1, "gasto": 1999.99}, {"id": "efb14cc2", "estado": "SP", "ultima_compra": "2017-06-21", "dias_sin_comprar": 434, "pedidos": 1, "gasto": 1999.99}, {"id": "0bc62798", "estado": "MG", "ultima_compra": "2017-12-10", "dias_sin_comprar": 262, "pedidos": 1, "gasto": 1999.9}, {"id": "75a8083e", "estado": "SC", "ultima_compra": "2017-11-21", "dias_sin_comprar": 281, "pedidos": 1, "gasto": 1999.9}, {"id": "26745aef", "estado": "SP", "ultima_compra": "2017-10-28", "dias_sin_comprar": 305, "pedidos": 1, "gasto": 1999.0}, {"id": "7c82b917", "estado": "RS", "ultima_compra": "2017-01-27", "dias_sin_comprar": 579, "pedidos": 1, "gasto": 1999.0}, {"id": "82c0c03a", "estado": "SC", "ultima_compra": "2017-11-28", "dias_sin_comprar": 274, "pedidos": 1, "gasto": 1999.0}, {"id": "918c2334", "estado": "PE", "ultima_compra": "2017-08-16", "dias_sin_comprar": 378, "pedidos": 1, "gasto": 1999.0}, {"id": "b8b32554", "estado": "SP", "ultima_compra": "2017-11-17", "dias_sin_comprar": 285, "pedidos": 1, "gasto": 1999.0}, {"id": "ee10b948", "estado": "SP", "ultima_compra": "2017-04-01", "dias_sin_comprar": 515, "pedidos": 1, "gasto": 1999.0}, {"id": "3d609523", "estado": "SP", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 1, "gasto": 1997.0}, {"id": "613835be", "estado": "SP", "ultima_compra": "2018-01-16", "dias_sin_comprar": 225, "pedidos": 1, "gasto": 1997.0}, {"id": "af17def0", "estado": "MG", "ultima_compra": "2017-11-23", "dias_sin_comprar": 279, "pedidos": 1, "gasto": 1997.0}, {"id": "ea1c9b1a", "estado": "RS", "ultima_compra": "2018-01-28", "dias_sin_comprar": 213, "pedidos": 1, "gasto": 1997.0}, {"id": "559026a1", "estado": "SP", "ultima_compra": "2018-03-01", "dias_sin_comprar": 181, "pedidos": 1, "gasto": 1995.0}, {"id": "44975ad3", "estado": "PB", "ultima_compra": "2017-10-18", "dias_sin_comprar": 315, "pedidos": 1, "gasto": 1989.0}, {"id": "5e5a9e72", "estado": "PE", "ultima_compra": "2017-10-26", "dias_sin_comprar": 307, "pedidos": 1, "gasto": 1989.0}, {"id": "8f86544c", "estado": "SP", "ultima_compra": "2017-10-23", "dias_sin_comprar": 310, "pedidos": 1, "gasto": 1989.0}, {"id": "a3331aa4", "estado": "SP", "ultima_compra": "2017-10-09", "dias_sin_comprar": 324, "pedidos": 1, "gasto": 1989.0}, {"id": "1da09dd6", "estado": "RJ", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 3, "gasto": 1980.28}, {"id": "15be5104", "estado": "MG", "ultima_compra": "2017-10-15", "dias_sin_comprar": 318, "pedidos": 1, "gasto": 1980.0}, {"id": "60055ae4", "estado": "SP", "ultima_compra": "2017-09-09", "dias_sin_comprar": 354, "pedidos": 1, "gasto": 1980.0}, {"id": "698e1cf8", "estado": "GO", "ultima_compra": "2017-08-23", "dias_sin_comprar": 371, "pedidos": 1, "gasto": 1974.0}, {"id": "2621b577", "estado": "BA", "ultima_compra": "2017-04-03", "dias_sin_comprar": 513, "pedidos": 1, "gasto": 1964.0}, {"id": "e09ede10", "estado": "SP", "ultima_compra": "2017-03-22", "dias_sin_comprar": 525, "pedidos": 1, "gasto": 1949.9}, {"id": "69b2b293", "estado": "RS", "ultima_compra": "2017-01-29", "dias_sin_comprar": 577, "pedidos": 1, "gasto": 1934.0}, {"id": "d77f9e20", "estado": "SP", "ultima_compra": "2017-05-23", "dias_sin_comprar": 463, "pedidos": 1, "gasto": 1899.12}, {"id": "e650a740", "estado": "PE", "ultima_compra": "2017-05-07", "dias_sin_comprar": 479, "pedidos": 1, "gasto": 1899.12}, {"id": "237beb4b", "estado": "PR", "ultima_compra": "2018-02-26", "dias_sin_comprar": 184, "pedidos": 1, "gasto": 1899.05}, {"id": "15dcd36d", "estado": "PR", "ultima_compra": "2017-12-18", "dias_sin_comprar": 254, "pedidos": 1, "gasto": 1899.0}, {"id": "5a7881e3", "estado": "SP", "ultima_compra": "2017-02-28", "dias_sin_comprar": 547, "pedidos": 1, "gasto": 1890.0}, {"id": "9410c05c", "estado": "SP", "ultima_compra": "2017-06-19", "dias_sin_comprar": 436, "pedidos": 1, "gasto": 1890.0}, {"id": "a1bd814d", "estado": "MG", "ultima_compra": "2017-09-13", "dias_sin_comprar": 350, "pedidos": 1, "gasto": 1890.0}, {"id": "b8ca2e14", "estado": "SP", "ultima_compra": "2017-09-16", "dias_sin_comprar": 347, "pedidos": 1, "gasto": 1890.0}, {"id": "3d47f436", "estado": "SP", "ultima_compra": "2017-10-02", "dias_sin_comprar": 331, "pedidos": 1, "gasto": 1879.9}, {"id": "8637975a", "estado": "RS", "ultima_compra": "2017-05-10", "dias_sin_comprar": 476, "pedidos": 1, "gasto": 1878.33}, {"id": "66ec2bc0", "estado": "PB", "ultima_compra": "2018-01-07", "dias_sin_comprar": 234, "pedidos": 1, "gasto": 1850.0}, {"id": "7e1dc025", "estado": "RJ", "ultima_compra": "2017-05-31", "dias_sin_comprar": 455, "pedidos": 1, "gasto": 1850.0}, {"id": "196fb9c6", "estado": "RJ", "ultima_compra": "2018-01-24", "dias_sin_comprar": 217, "pedidos": 1, "gasto": 1849.9}, {"id": "9df040be", "estado": "SP", "ultima_compra": "2017-05-07", "dias_sin_comprar": 479, "pedidos": 1, "gasto": 1820.0}, {"id": "94bbded6", "estado": "SP", "ultima_compra": "2017-08-18", "dias_sin_comprar": 376, "pedidos": 1, "gasto": 1815.91}, {"id": "03265248", "estado": "SP", "ultima_compra": "2017-03-01", "dias_sin_comprar": 546, "pedidos": 1, "gasto": 1800.0}, {"id": "d61c923f", "estado": "MG", "ultima_compra": "2017-05-22", "dias_sin_comprar": 464, "pedidos": 1, "gasto": 1799.0}, {"id": "9b661514", "estado": "AL", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1798.0}, {"id": "336e7488", "estado": "BA", "ultima_compra": "2017-12-07", "dias_sin_comprar": 265, "pedidos": 1, "gasto": 1797.0}, {"id": "35dac575", "estado": "SP", "ultima_compra": "2018-02-11", "dias_sin_comprar": 199, "pedidos": 1, "gasto": 1790.0}, {"id": "13fb439d", "estado": "SP", "ultima_compra": "2018-02-09", "dias_sin_comprar": 201, "pedidos": 1, "gasto": 1780.0}, {"id": "280bf653", "estado": "SP", "ultima_compra": "2017-03-31", "dias_sin_comprar": 516, "pedidos": 1, "gasto": 1775.0}, {"id": "798c34ff", "estado": "MG", "ultima_compra": "2017-12-04", "dias_sin_comprar": 268, "pedidos": 2, "gasto": 1770.3}, {"id": "604b4fd4", "estado": "RJ", "ultima_compra": "2017-06-04", "dias_sin_comprar": 451, "pedidos": 1, "gasto": 1769.0}, {"id": "3895f60f", "estado": "BA", "ultima_compra": "2018-01-12", "dias_sin_comprar": 229, "pedidos": 1, "gasto": 1767.8}, {"id": "85b483b4", "estado": "SP", "ultima_compra": "2018-01-22", "dias_sin_comprar": 219, "pedidos": 1, "gasto": 1750.0}, {"id": "141b3509", "estado": "SP", "ultima_compra": "2017-12-15", "dias_sin_comprar": 257, "pedidos": 1, "gasto": 1749.99}, {"id": "6e470143", "estado": "SP", "ultima_compra": "2017-04-26", "dias_sin_comprar": 490, "pedidos": 1, "gasto": 1740.0}, {"id": "bf317137", "estado": "SP", "ultima_compra": "2017-11-14", "dias_sin_comprar": 288, "pedidos": 1, "gasto": 1740.0}, {"id": "6d3c02f0", "estado": "GO", "ultima_compra": "2017-03-23", "dias_sin_comprar": 524, "pedidos": 1, "gasto": 1737.0}, {"id": "3a205021", "estado": "MT", "ultima_compra": "2017-08-01", "dias_sin_comprar": 393, "pedidos": 1, "gasto": 1736.0}, {"id": "c5365631", "estado": "PR", "ultima_compra": "2017-09-29", "dias_sin_comprar": 334, "pedidos": 1, "gasto": 1736.0}, {"id": "15fbc48d", "estado": "SP", "ultima_compra": "2017-01-26", "dias_sin_comprar": 580, "pedidos": 1, "gasto": 1718.0}, {"id": "cef29e79", "estado": "MG", "ultima_compra": "2018-01-18", "dias_sin_comprar": 223, "pedidos": 3, "gasto": 1712.72}, {"id": "2c32247b", "estado": "MT", "ultima_compra": "2017-07-05", "dias_sin_comprar": 420, "pedidos": 1, "gasto": 1704.97}, {"id": "d3bf48ab", "estado": "GO", "ultima_compra": "2017-09-02", "dias_sin_comprar": 361, "pedidos": 1, "gasto": 1700.0}, {"id": "132f423d", "estado": "MG", "ultima_compra": "2018-02-26", "dias_sin_comprar": 184, "pedidos": 1, "gasto": 1699.99}, {"id": "26ad7098", "estado": "SP", "ultima_compra": "2017-10-06", "dias_sin_comprar": 327, "pedidos": 1, "gasto": 1699.99}, {"id": "45509848", "estado": "SP", "ultima_compra": "2017-02-12", "dias_sin_comprar": 563, "pedidos": 1, "gasto": 1699.99}, {"id": "ac0ec8bd", "estado": "ES", "ultima_compra": "2017-11-24", "dias_sin_comprar": 278, "pedidos": 1, "gasto": 1699.99}, {"id": "9770456b", "estado": "RJ", "ultima_compra": "2017-11-14", "dias_sin_comprar": 288, "pedidos": 1, "gasto": 1699.0}, {"id": "9cde2485", "estado": "PR", "ultima_compra": "2017-12-12", "dias_sin_comprar": 260, "pedidos": 1, "gasto": 1698.99}, {"id": "9fc8316f", "estado": "PI", "ultima_compra": "2018-01-26", "dias_sin_comprar": 215, "pedidos": 1, "gasto": 1695.0}, {"id": "0adb59a4", "estado": "RS", "ultima_compra": "2018-02-18", "dias_sin_comprar": 192, "pedidos": 1, "gasto": 1688.0}, {"id": "23841d4a", "estado": "AM", "ultima_compra": "2018-01-26", "dias_sin_comprar": 215, "pedidos": 1, "gasto": 1688.0}, {"id": "7da11710", "estado": "SP", "ultima_compra": "2017-10-01", "dias_sin_comprar": 332, "pedidos": 1, "gasto": 1688.0}, {"id": "ac507528", "estado": "MG", "ultima_compra": "2017-09-28", "dias_sin_comprar": 335, "pedidos": 1, "gasto": 1679.6}, {"id": "92fb5b65", "estado": "RJ", "ultima_compra": "2017-05-27", "dias_sin_comprar": 459, "pedidos": 1, "gasto": 1672.0}, {"id": "4e284eec", "estado": "SP", "ultima_compra": "2017-09-13", "dias_sin_comprar": 350, "pedidos": 1, "gasto": 1663.0}, {"id": "a1044dd7", "estado": "SP", "ultima_compra": "2017-12-20", "dias_sin_comprar": 252, "pedidos": 2, "gasto": 1663.0}, {"id": "59833879", "estado": "BA", "ultima_compra": "2018-02-03", "dias_sin_comprar": 207, "pedidos": 1, "gasto": 1658.83}, {"id": "ff0e4a6f", "estado": "SP", "ultima_compra": "2017-04-01", "dias_sin_comprar": 515, "pedidos": 1, "gasto": 1654.44}, {"id": "b8521fd4", "estado": "RJ", "ultima_compra": "2017-04-29", "dias_sin_comprar": 487, "pedidos": 1, "gasto": 1653.88}, {"id": "f94b8315", "estado": "RS", "ultima_compra": "2017-10-27", "dias_sin_comprar": 306, "pedidos": 1, "gasto": 1653.0}, {"id": "f6255a32", "estado": "MT", "ultima_compra": "2017-11-24", "dias_sin_comprar": 278, "pedidos": 1, "gasto": 1650.8}, {"id": "3bd9e0cb", "estado": "MG", "ultima_compra": "2017-12-29", "dias_sin_comprar": 243, "pedidos": 1, "gasto": 1650.0}, {"id": "923c196b", "estado": "SP", "ultima_compra": "2017-09-14", "dias_sin_comprar": 349, "pedidos": 1, "gasto": 1649.99}, {"id": "3d16d541", "estado": "MG", "ultima_compra": "2017-09-18", "dias_sin_comprar": 345, "pedidos": 1, "gasto": 1640.7}, {"id": "0a8ddbf9", "estado": "SP", "ultima_compra": "2017-07-05", "dias_sin_comprar": 420, "pedidos": 1, "gasto": 1625.0}, {"id": "aa1d9bb1", "estado": "BA", "ultima_compra": "2017-05-09", "dias_sin_comprar": 477, "pedidos": 1, "gasto": 1618.2}, {"id": "36d7df3b", "estado": "RJ", "ultima_compra": "2017-11-16", "dias_sin_comprar": 286, "pedidos": 1, "gasto": 1610.0}, {"id": "d233f180", "estado": "RJ", "ultima_compra": "2017-10-04", "dias_sin_comprar": 329, "pedidos": 1, "gasto": 1610.0}, {"id": "9fca9eee", "estado": "SP", "ultima_compra": "2017-04-07", "dias_sin_comprar": 509, "pedidos": 1, "gasto": 1609.9}, {"id": "29a553dd", "estado": "RJ", "ultima_compra": "2017-10-07", "dias_sin_comprar": 326, "pedidos": 1, "gasto": 1599.99}, {"id": "67031f3c", "estado": "MA", "ultima_compra": "2017-10-05", "dias_sin_comprar": 328, "pedidos": 1, "gasto": 1599.99}, {"id": "67d859ff", "estado": "PR", "ultima_compra": "2017-10-01", "dias_sin_comprar": 332, "pedidos": 1, "gasto": 1599.99}, {"id": "99f12542", "estado": "SC", "ultima_compra": "2017-09-30", "dias_sin_comprar": 333, "pedidos": 1, "gasto": 1599.99}, {"id": "b0ee09a6", "estado": "SP", "ultima_compra": "2017-09-27", "dias_sin_comprar": 336, "pedidos": 1, "gasto": 1599.99}, {"id": "bdd88e5f", "estado": "SP", "ultima_compra": "2017-10-03", "dias_sin_comprar": 330, "pedidos": 1, "gasto": 1599.99}, {"id": "cb622493", "estado": "SP", "ultima_compra": "2017-09-25", "dias_sin_comprar": 338, "pedidos": 1, "gasto": 1599.99}, {"id": "d1c84317", "estado": "RJ", "ultima_compra": "2017-10-02", "dias_sin_comprar": 331, "pedidos": 1, "gasto": 1599.99}, {"id": "f6e8b25c", "estado": "BA", "ultima_compra": "2017-10-05", "dias_sin_comprar": 328, "pedidos": 1, "gasto": 1599.99}, {"id": "fa03405c", "estado": "DF", "ultima_compra": "2017-09-28", "dias_sin_comprar": 335, "pedidos": 1, "gasto": 1599.99}, {"id": "0b8f48c2", "estado": "PA", "ultima_compra": "2017-11-06", "dias_sin_comprar": 296, "pedidos": 1, "gasto": 1599.0}, {"id": "55b2d632", "estado": "PE", "ultima_compra": "2018-01-14", "dias_sin_comprar": 227, "pedidos": 1, "gasto": 1599.0}, {"id": "5bc4d654", "estado": "BA", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 1, "gasto": 1599.0}, {"id": "8411ef4e", "estado": "RJ", "ultima_compra": "2017-11-12", "dias_sin_comprar": 290, "pedidos": 1, "gasto": 1599.0}, {"id": "c1099629", "estado": "SP", "ultima_compra": "2017-12-01", "dias_sin_comprar": 271, "pedidos": 1, "gasto": 1599.0}, {"id": "fac9eb2c", "estado": "MS", "ultima_compra": "2018-01-13", "dias_sin_comprar": 228, "pedidos": 1, "gasto": 1599.0}, {"id": "3d16152c", "estado": "AL", "ultima_compra": "2017-08-20", "dias_sin_comprar": 374, "pedidos": 1, "gasto": 1597.35}, {"id": "81238d42", "estado": "BA", "ultima_compra": "2017-07-18", "dias_sin_comprar": 407, "pedidos": 1, "gasto": 1597.35}, {"id": "1d105578", "estado": "MG", "ultima_compra": "2017-04-02", "dias_sin_comprar": 514, "pedidos": 1, "gasto": 1596.0}, {"id": "f3140df8", "estado": "BA", "ultima_compra": "2018-02-16", "dias_sin_comprar": 194, "pedidos": 1, "gasto": 1596.0}, {"id": "ffba9f9d", "estado": "PA", "ultima_compra": "2017-02-27", "dias_sin_comprar": 548, "pedidos": 1, "gasto": 1591.2}, {"id": "b5d5805f", "estado": "RJ", "ultima_compra": "2017-08-21", "dias_sin_comprar": 373, "pedidos": 1, "gasto": 1589.96}, {"id": "d1aef037", "estado": "SC", "ultima_compra": "2017-03-14", "dias_sin_comprar": 533, "pedidos": 1, "gasto": 1589.0}, {"id": "ae4b37b3", "estado": "DF", "ultima_compra": "2017-06-14", "dias_sin_comprar": 441, "pedidos": 1, "gasto": 1585.83}, {"id": "fffcf5a5", "estado": "PE", "ultima_compra": "2017-06-08", "dias_sin_comprar": 447, "pedidos": 1, "gasto": 1570.0}, {"id": "13d04f61", "estado": "RS", "ultima_compra": "2018-02-05", "dias_sin_comprar": 205, "pedidos": 1, "gasto": 1561.0}, {"id": "c6b1d0d3", "estado": "SP", "ultima_compra": "2018-01-30", "dias_sin_comprar": 211, "pedidos": 1, "gasto": 1561.0}, {"id": "d184e6ed", "estado": "PR", "ultima_compra": "2018-02-05", "dias_sin_comprar": 205, "pedidos": 1, "gasto": 1561.0}, {"id": "6d394722", "estado": "RJ", "ultima_compra": "2017-11-04", "dias_sin_comprar": 298, "pedidos": 1, "gasto": 1559.92}, {"id": "03fe4b83", "estado": "RJ", "ultima_compra": "2018-01-10", "dias_sin_comprar": 231, "pedidos": 1, "gasto": 1554.0}, {"id": "057dbb60", "estado": "PE", "ultima_compra": "2017-09-12", "dias_sin_comprar": 351, "pedidos": 1, "gasto": 1549.99}, {"id": "262f884f", "estado": "SP", "ultima_compra": "2017-09-07", "dias_sin_comprar": 356, "pedidos": 1, "gasto": 1549.99}, {"id": "43df16fc", "estado": "MT", "ultima_compra": "2017-09-07", "dias_sin_comprar": 356, "pedidos": 1, "gasto": 1549.99}, {"id": "5eb539db", "estado": "MG", "ultima_compra": "2017-04-06", "dias_sin_comprar": 510, "pedidos": 1, "gasto": 1549.0}, {"id": "527f7f32", "estado": "PE", "ultima_compra": "2017-05-11", "dias_sin_comprar": 475, "pedidos": 1, "gasto": 1520.0}, {"id": "93bc212a", "estado": "RS", "ultima_compra": "2017-10-05", "dias_sin_comprar": 328, "pedidos": 1, "gasto": 1519.46}, {"id": "c169c993", "estado": "PR", "ultima_compra": "2017-05-09", "dias_sin_comprar": 477, "pedidos": 2, "gasto": 1511.2}, {"id": "8b20a60a", "estado": "MG", "ultima_compra": "2018-02-20", "dias_sin_comprar": 190, "pedidos": 1, "gasto": 1501.5}, {"id": "caadc9a4", "estado": "SP", "ultima_compra": "2017-11-02", "dias_sin_comprar": 300, "pedidos": 1, "gasto": 1500.0}, {"id": "f94c00f0", "estado": "PA", "ultima_compra": "2017-06-01", "dias_sin_comprar": 454, "pedidos": 1, "gasto": 1500.0}, {"id": "71c99dc3", "estado": "RJ", "ultima_compra": "2018-02-26", "dias_sin_comprar": 184, "pedidos": 1, "gasto": 1499.99}, {"id": "7e251bdc", "estado": "RJ", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1499.99}, {"id": "1b3033b0", "estado": "PA", "ultima_compra": "2017-12-20", "dias_sin_comprar": 252, "pedidos": 1, "gasto": 1499.9}, {"id": "9bd3a0d5", "estado": "PR", "ultima_compra": "2017-04-28", "dias_sin_comprar": 488, "pedidos": 1, "gasto": 1499.8}, {"id": "650f9452", "estado": "MS", "ultima_compra": "2017-10-16", "dias_sin_comprar": 317, "pedidos": 1, "gasto": 1490.0}, {"id": "856cfe0b", "estado": "MS", "ultima_compra": "2017-10-03", "dias_sin_comprar": 330, "pedidos": 1, "gasto": 1490.0}, {"id": "b64460d7", "estado": "SP", "ultima_compra": "2017-10-21", "dias_sin_comprar": 312, "pedidos": 1, "gasto": 1479.98}, {"id": "145f5c92", "estado": "PE", "ultima_compra": "2017-10-05", "dias_sin_comprar": 328, "pedidos": 1, "gasto": 1459.0}, {"id": "55ee0c63", "estado": "RJ", "ultima_compra": "2017-08-07", "dias_sin_comprar": 387, "pedidos": 1, "gasto": 1458.0}, {"id": "b11b06cf", "estado": "SP", "ultima_compra": "2017-11-26", "dias_sin_comprar": 276, "pedidos": 1, "gasto": 1458.0}, {"id": "6b2af0e9", "estado": "BA", "ultima_compra": "2017-03-03", "dias_sin_comprar": 544, "pedidos": 1, "gasto": 1450.0}, {"id": "4c21c589", "estado": "MG", "ultima_compra": "2017-07-21", "dias_sin_comprar": 404, "pedidos": 1, "gasto": 1449.5}, {"id": "8091550a", "estado": "RJ", "ultima_compra": "2017-05-30", "dias_sin_comprar": 456, "pedidos": 1, "gasto": 1449.0}, {"id": "b248c92e", "estado": "SP", "ultima_compra": "2018-02-21", "dias_sin_comprar": 189, "pedidos": 2, "gasto": 1442.6}, {"id": "4b3bb058", "estado": "SP", "ultima_compra": "2017-05-15", "dias_sin_comprar": 471, "pedidos": 1, "gasto": 1440.0}, {"id": "0f5f7582", "estado": "PR", "ultima_compra": "2017-10-31", "dias_sin_comprar": 302, "pedidos": 1, "gasto": 1437.0}, {"id": "10dbffc4", "estado": "MG", "ultima_compra": "2017-10-26", "dias_sin_comprar": 307, "pedidos": 1, "gasto": 1437.0}, {"id": "430f484a", "estado": "MG", "ultima_compra": "2017-11-03", "dias_sin_comprar": 299, "pedidos": 1, "gasto": 1437.0}, {"id": "4e5a10bd", "estado": "MG", "ultima_compra": "2017-10-27", "dias_sin_comprar": 306, "pedidos": 1, "gasto": 1437.0}, {"id": "5a0b87c3", "estado": "MG", "ultima_compra": "2017-10-22", "dias_sin_comprar": 311, "pedidos": 1, "gasto": 1437.0}, {"id": "739209d8", "estado": "MG", "ultima_compra": "2017-10-10", "dias_sin_comprar": 323, "pedidos": 1, "gasto": 1437.0}, {"id": "7a44821e", "estado": "AP", "ultima_compra": "2017-10-24", "dias_sin_comprar": 309, "pedidos": 1, "gasto": 1437.0}, {"id": "7efc49d7", "estado": "CE", "ultima_compra": "2017-11-04", "dias_sin_comprar": 298, "pedidos": 1, "gasto": 1437.0}, {"id": "8d2fb661", "estado": "RJ", "ultima_compra": "2017-10-16", "dias_sin_comprar": 317, "pedidos": 1, "gasto": 1437.0}, {"id": "ae06b018", "estado": "MA", "ultima_compra": "2017-10-30", "dias_sin_comprar": 303, "pedidos": 1, "gasto": 1437.0}, {"id": "bfb1a102", "estado": "MG", "ultima_compra": "2017-11-02", "dias_sin_comprar": 300, "pedidos": 1, "gasto": 1437.0}, {"id": "c72e291c", "estado": "MG", "ultima_compra": "2017-10-15", "dias_sin_comprar": 318, "pedidos": 1, "gasto": 1437.0}, {"id": "eb53ee67", "estado": "RJ", "ultima_compra": "2017-10-23", "dias_sin_comprar": 310, "pedidos": 1, "gasto": 1437.0}, {"id": "fc360164", "estado": "MG", "ultima_compra": "2017-11-02", "dias_sin_comprar": 300, "pedidos": 1, "gasto": 1437.0}, {"id": "79fe0e57", "estado": "SP", "ultima_compra": "2017-04-05", "dias_sin_comprar": 511, "pedidos": 1, "gasto": 1420.0}, {"id": "24e998db", "estado": "SP", "ultima_compra": "2017-12-01", "dias_sin_comprar": 271, "pedidos": 1, "gasto": 1400.0}, {"id": "0cfb94f1", "estado": "RJ", "ultima_compra": "2018-01-17", "dias_sin_comprar": 224, "pedidos": 1, "gasto": 1399.99}, {"id": "97071ed6", "estado": "MG", "ultima_compra": "2017-10-04", "dias_sin_comprar": 329, "pedidos": 1, "gasto": 1399.99}, {"id": "985e9316", "estado": "RJ", "ultima_compra": "2017-12-30", "dias_sin_comprar": 242, "pedidos": 1, "gasto": 1399.99}, {"id": "2bca9b24", "estado": "CE", "ultima_compra": "2017-11-14", "dias_sin_comprar": 288, "pedidos": 1, "gasto": 1399.9}, {"id": "471d4914", "estado": "CE", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1399.9}, {"id": "ad5dccfe", "estado": "SP", "ultima_compra": "2017-12-02", "dias_sin_comprar": 270, "pedidos": 1, "gasto": 1399.9}, {"id": "da1e7179", "estado": "SC", "ultima_compra": "2017-11-09", "dias_sin_comprar": 293, "pedidos": 2, "gasto": 1399.9}, {"id": "3dc72442", "estado": "MG", "ultima_compra": "2017-12-04", "dias_sin_comprar": 268, "pedidos": 1, "gasto": 1399.5}, {"id": "b1791d73", "estado": "RJ", "ultima_compra": "2017-04-05", "dias_sin_comprar": 511, "pedidos": 1, "gasto": 1399.0}, {"id": "fdaa290a", "estado": "RJ", "ultima_compra": "2016-10-08", "dias_sin_comprar": 690, "pedidos": 1, "gasto": 1399.0}, {"id": "72eea0b9", "estado": "MG", "ultima_compra": "2018-01-16", "dias_sin_comprar": 225, "pedidos": 1, "gasto": 1395.0}, {"id": "0eee96b8", "estado": "PR", "ultima_compra": "2017-06-26", "dias_sin_comprar": 429, "pedidos": 1, "gasto": 1390.0}, {"id": "3422b60b", "estado": "RS", "ultima_compra": "2017-11-11", "dias_sin_comprar": 291, "pedidos": 1, "gasto": 1390.0}, {"id": "7fa6d33a", "estado": "MG", "ultima_compra": "2018-01-22", "dias_sin_comprar": 219, "pedidos": 1, "gasto": 1390.0}, {"id": "eaa604ab", "estado": "MG", "ultima_compra": "2017-12-02", "dias_sin_comprar": 270, "pedidos": 2, "gasto": 1388.0}, {"id": "774c075f", "estado": "MG", "ultima_compra": "2017-12-26", "dias_sin_comprar": 246, "pedidos": 1, "gasto": 1384.0}, {"id": "41deb128", "estado": "SC", "ultima_compra": "2017-08-11", "dias_sin_comprar": 383, "pedidos": 1, "gasto": 1380.0}, {"id": "985289b5", "estado": "TO", "ultima_compra": "2017-10-13", "dias_sin_comprar": 320, "pedidos": 1, "gasto": 1380.0}, {"id": "aeb502c0", "estado": "PB", "ultima_compra": "2018-01-03", "dias_sin_comprar": 238, "pedidos": 1, "gasto": 1380.0}, {"id": "b0e6870a", "estado": "PA", "ultima_compra": "2017-03-17", "dias_sin_comprar": 530, "pedidos": 1, "gasto": 1380.0}, {"id": "ef7361e1", "estado": "MA", "ultima_compra": "2018-02-25", "dias_sin_comprar": 185, "pedidos": 1, "gasto": 1380.0}, {"id": "20a5257c", "estado": "SP", "ultima_compra": "2017-09-12", "dias_sin_comprar": 351, "pedidos": 1, "gasto": 1379.0}, {"id": "4d402e51", "estado": "MG", "ultima_compra": "2018-01-06", "dias_sin_comprar": 235, "pedidos": 1, "gasto": 1375.0}, {"id": "540bd689", "estado": "RS", "ultima_compra": "2017-04-10", "dias_sin_comprar": 506, "pedidos": 1, "gasto": 1375.0}, {"id": "77dc1d01", "estado": "CE", "ultima_compra": "2017-03-04", "dias_sin_comprar": 543, "pedidos": 1, "gasto": 1375.0}, {"id": "85333adc", "estado": "SP", "ultima_compra": "2017-12-15", "dias_sin_comprar": 257, "pedidos": 1, "gasto": 1360.0}, {"id": "cc073557", "estado": "GO", "ultima_compra": "2017-10-30", "dias_sin_comprar": 303, "pedidos": 1, "gasto": 1360.0}, {"id": "4f94b2a1", "estado": "RJ", "ultima_compra": "2017-05-31", "dias_sin_comprar": 455, "pedidos": 1, "gasto": 1359.0}, {"id": "a5835097", "estado": "RJ", "ultima_compra": "2017-08-01", "dias_sin_comprar": 393, "pedidos": 1, "gasto": 1359.0}, {"id": "f03553cc", "estado": "AP", "ultima_compra": "2018-01-02", "dias_sin_comprar": 239, "pedidos": 1, "gasto": 1358.24}, {"id": "6e26bbea", "estado": "RJ", "ultima_compra": "2018-01-02", "dias_sin_comprar": 239, "pedidos": 2, "gasto": 1355.9}, {"id": "76cef8c0", "estado": "RJ", "ultima_compra": "2017-11-03", "dias_sin_comprar": 299, "pedidos": 1, "gasto": 1350.0}, {"id": "78110b00", "estado": "SP", "ultima_compra": "2018-01-08", "dias_sin_comprar": 233, "pedidos": 1, "gasto": 1350.0}, {"id": "d409c559", "estado": "RJ", "ultima_compra": "2018-02-21", "dias_sin_comprar": 189, "pedidos": 1, "gasto": 1350.0}, {"id": "f5ae5956", "estado": "DF", "ultima_compra": "2017-12-25", "dias_sin_comprar": 247, "pedidos": 1, "gasto": 1350.0}, {"id": "3e134146", "estado": "MA", "ultima_compra": "2017-09-18", "dias_sin_comprar": 345, "pedidos": 1, "gasto": 1349.99}, {"id": "58c1b085", "estado": "PE", "ultima_compra": "2017-09-17", "dias_sin_comprar": 346, "pedidos": 1, "gasto": 1349.99}, {"id": "be350e72", "estado": "SC", "ultima_compra": "2017-09-17", "dias_sin_comprar": 346, "pedidos": 1, "gasto": 1349.99}, {"id": "3ec83b54", "estado": "SP", "ultima_compra": "2018-02-27", "dias_sin_comprar": 183, "pedidos": 2, "gasto": 1349.46}, {"id": "3f6a946e", "estado": "MG", "ultima_compra": "2017-06-25", "dias_sin_comprar": 430, "pedidos": 1, "gasto": 1349.0}, {"id": "855d32ca", "estado": "SP", "ultima_compra": "2017-02-07", "dias_sin_comprar": 568, "pedidos": 1, "gasto": 1349.0}, {"id": "f0daba1c", "estado": "RJ", "ultima_compra": "2017-05-11", "dias_sin_comprar": 475, "pedidos": 2, "gasto": 1342.99}, {"id": "4a22982d", "estado": "RJ", "ultima_compra": "2017-12-12", "dias_sin_comprar": 260, "pedidos": 1, "gasto": 1340.0}, {"id": "64b97e6d", "estado": "AM", "ultima_compra": "2017-11-09", "dias_sin_comprar": 293, "pedidos": 1, "gasto": 1340.0}, {"id": "920bd0e1", "estado": "CE", "ultima_compra": "2017-10-29", "dias_sin_comprar": 304, "pedidos": 1, "gasto": 1340.0}, {"id": "bc45674f", "estado": "SP", "ultima_compra": "2017-12-16", "dias_sin_comprar": 256, "pedidos": 1, "gasto": 1340.0}, {"id": "c1eed380", "estado": "DF", "ultima_compra": "2017-11-01", "dias_sin_comprar": 301, "pedidos": 1, "gasto": 1340.0}, {"id": "d1b6bbb5", "estado": "RJ", "ultima_compra": "2017-10-27", "dias_sin_comprar": 306, "pedidos": 1, "gasto": 1340.0}, {"id": "df030c3c", "estado": "MT", "ultima_compra": "2017-10-31", "dias_sin_comprar": 302, "pedidos": 1, "gasto": 1340.0}, {"id": "e92a2a87", "estado": "PB", "ultima_compra": "2017-10-11", "dias_sin_comprar": 322, "pedidos": 1, "gasto": 1340.0}, {"id": "6c749436", "estado": "SP", "ultima_compra": "2018-01-04", "dias_sin_comprar": 237, "pedidos": 1, "gasto": 1330.0}, {"id": "ba3f35c1", "estado": "MG", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1326.5}, {"id": "ce8c3a91", "estado": "PA", "ultima_compra": "2017-12-27", "dias_sin_comprar": 245, "pedidos": 1, "gasto": 1326.0}, {"id": "07c9259c", "estado": "RS", "ultima_compra": "2017-02-08", "dias_sin_comprar": 567, "pedidos": 1, "gasto": 1323.0}, {"id": "4bdaaab3", "estado": "SP", "ultima_compra": "2018-02-02", "dias_sin_comprar": 208, "pedidos": 1, "gasto": 1320.0}, {"id": "8e18da34", "estado": "CE", "ultima_compra": "2017-09-28", "dias_sin_comprar": 335, "pedidos": 1, "gasto": 1316.0}, {"id": "8be5c6cc", "estado": "SE", "ultima_compra": "2018-02-24", "dias_sin_comprar": 186, "pedidos": 1, "gasto": 1314.99}, {"id": "0424c5eb", "estado": "DF", "ultima_compra": "2017-03-13", "dias_sin_comprar": 534, "pedidos": 1, "gasto": 1309.99}, {"id": "1c7267f3", "estado": "RS", "ultima_compra": "2017-03-17", "dias_sin_comprar": 530, "pedidos": 1, "gasto": 1300.52}, {"id": "61e20081", "estado": "MG", "ultima_compra": "2017-09-02", "dias_sin_comprar": 361, "pedidos": 1, "gasto": 1300.0}, {"id": "69a96af4", "estado": "SP", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1300.0}, {"id": "73269524", "estado": "RJ", "ultima_compra": "2017-08-14", "dias_sin_comprar": 380, "pedidos": 1, "gasto": 1300.0}, {"id": "85101bc6", "estado": "SP", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1300.0}, {"id": "8ed5f159", "estado": "SP", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1300.0}, {"id": "aac441a3", "estado": "SP", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1300.0}, {"id": "b3441a42", "estado": "DF", "ultima_compra": "2017-09-02", "dias_sin_comprar": 361, "pedidos": 1, "gasto": 1300.0}, {"id": "bce40e16", "estado": "SP", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1300.0}, {"id": "e203d1b0", "estado": "SP", "ultima_compra": "2017-09-02", "dias_sin_comprar": 361, "pedidos": 1, "gasto": 1300.0}, {"id": "f61d8584", "estado": "RS", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1300.0}, {"id": "f9aea0c7", "estado": "SP", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1300.0}, {"id": "51c6848f", "estado": "SP", "ultima_compra": "2017-06-01", "dias_sin_comprar": 454, "pedidos": 1, "gasto": 1299.99}, {"id": "547f5f9a", "estado": "SP", "ultima_compra": "2017-02-13", "dias_sin_comprar": 562, "pedidos": 1, "gasto": 1299.99}, {"id": "b8cd1885", "estado": "SP", "ultima_compra": "2017-05-05", "dias_sin_comprar": 481, "pedidos": 1, "gasto": 1299.99}, {"id": "09a404d8", "estado": "CE", "ultima_compra": "2017-09-04", "dias_sin_comprar": 359, "pedidos": 1, "gasto": 1299.9}, {"id": "0a247a22", "estado": "RN", "ultima_compra": "2017-11-18", "dias_sin_comprar": 284, "pedidos": 1, "gasto": 1299.9}, {"id": "1033eef3", "estado": "SP", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1299.9}, {"id": "16ae388d", "estado": "SP", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1299.9}, {"id": "362135e7", "estado": "MG", "ultima_compra": "2018-02-28", "dias_sin_comprar": 182, "pedidos": 1, "gasto": 1299.9}, {"id": "420add00", "estado": "SP", "ultima_compra": "2017-09-04", "dias_sin_comprar": 359, "pedidos": 1, "gasto": 1299.9}, {"id": "5a95daf3", "estado": "RJ", "ultima_compra": "2017-08-03", "dias_sin_comprar": 391, "pedidos": 1, "gasto": 1299.9}, {"id": "69d93815", "estado": "RO", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1299.9}, {"id": "8146bee4", "estado": "SP", "ultima_compra": "2017-09-04", "dias_sin_comprar": 359, "pedidos": 1, "gasto": 1299.9}, {"id": "97599f22", "estado": "SP", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1299.9}, {"id": "9dc7e983", "estado": "SP", "ultima_compra": "2017-09-04", "dias_sin_comprar": 359, "pedidos": 1, "gasto": 1299.9}, {"id": "b9aad088", "estado": "RJ", "ultima_compra": "2017-12-04", "dias_sin_comprar": 268, "pedidos": 1, "gasto": 1299.9}, {"id": "fc1266d0", "estado": "ES", "ultima_compra": "2017-11-23", "dias_sin_comprar": 279, "pedidos": 1, "gasto": 1299.9}, {"id": "21729203", "estado": "BA", "ultima_compra": "2018-01-23", "dias_sin_comprar": 218, "pedidos": 1, "gasto": 1299.65}, {"id": "314b6160", "estado": "RJ", "ultima_compra": "2017-01-26", "dias_sin_comprar": 580, "pedidos": 1, "gasto": 1299.0}, {"id": "3629a4b1", "estado": "MT", "ultima_compra": "2018-01-25", "dias_sin_comprar": 216, "pedidos": 1, "gasto": 1299.0}, {"id": "482b8357", "estado": "GO", "ultima_compra": "2017-01-27", "dias_sin_comprar": 579, "pedidos": 1, "gasto": 1299.0}, {"id": "69a43b90", "estado": "SP", "ultima_compra": "2017-07-27", "dias_sin_comprar": 398, "pedidos": 1, "gasto": 1299.0}, {"id": "9aed28a7", "estado": "RS", "ultima_compra": "2017-02-03", "dias_sin_comprar": 572, "pedidos": 1, "gasto": 1299.0}, {"id": "bcba7868", "estado": "SP", "ultima_compra": "2017-02-03", "dias_sin_comprar": 572, "pedidos": 1, "gasto": 1297.25}, {"id": "9eca5520", "estado": "PR", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 1, "gasto": 1296.0}, {"id": "35356c16", "estado": "SP", "ultima_compra": "2018-01-18", "dias_sin_comprar": 223, "pedidos": 1, "gasto": 1290.0}, {"id": "573711db", "estado": "MG", "ultima_compra": "2017-12-20", "dias_sin_comprar": 252, "pedidos": 1, "gasto": 1288.72}, {"id": "019ac558", "estado": "SP", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1287.0}, {"id": "3d540559", "estado": "PB", "ultima_compra": "2017-07-10", "dias_sin_comprar": 415, "pedidos": 1, "gasto": 1283.64}, {"id": "fc0aab61", "estado": "RJ", "ultima_compra": "2017-03-13", "dias_sin_comprar": 534, "pedidos": 1, "gasto": 1275.0}, {"id": "b25ff7d6", "estado": "SP", "ultima_compra": "2018-01-23", "dias_sin_comprar": 218, "pedidos": 1, "gasto": 1269.0}, {"id": "91c54819", "estado": "SP", "ultima_compra": "2018-02-22", "dias_sin_comprar": 188, "pedidos": 1, "gasto": 1265.89}, {"id": "f64f5e0a", "estado": "MG", "ultima_compra": "2017-10-10", "dias_sin_comprar": 323, "pedidos": 1, "gasto": 1260.0}, {"id": "ecdbc4bf", "estado": "SP", "ultima_compra": "2017-10-17", "dias_sin_comprar": 316, "pedidos": 2, "gasto": 1259.9}, {"id": "58cb2f5b", "estado": "SP", "ultima_compra": "2017-11-29", "dias_sin_comprar": 273, "pedidos": 1, "gasto": 1259.0}, {"id": "0f5ac8d5", "estado": "PR", "ultima_compra": "2017-11-27", "dias_sin_comprar": 275, "pedidos": 2, "gasto": 1252.35}, {"id": "198dc221", "estado": "SP", "ultima_compra": "2017-03-02", "dias_sin_comprar": 545, "pedidos": 1, "gasto": 1250.0}, {"id": "1a7928a9", "estado": "PR", "ultima_compra": "2017-11-25", "dias_sin_comprar": 277, "pedidos": 1, "gasto": 1250.0}, {"id": "233ceaab", "estado": "MS", "ultima_compra": "2017-06-26", "dias_sin_comprar": 429, "pedidos": 1, "gasto": 1250.0}, {"id": "416c7355", "estado": "SP", "ultima_compra": "2017-03-10", "dias_sin_comprar": 537, "pedidos": 1, "gasto": 1250.0}, {"id": "778a607e", "estado": "RS", "ultima_compra": "2018-01-08", "dias_sin_comprar": 233, "pedidos": 1, "gasto": 1250.0}, {"id": "f82be7dc", "estado": "SP", "ultima_compra": "2017-05-17", "dias_sin_comprar": 469, "pedidos": 1, "gasto": 1250.0}, {"id": "fb5326fd", "estado": "MT", "ultima_compra": "2017-02-20", "dias_sin_comprar": 555, "pedidos": 1, "gasto": 1250.0}, {"id": "fbd4d7e3", "estado": "CE", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1249.49}, {"id": "fd03997c", "estado": "ES", "ultima_compra": "2018-01-17", "dias_sin_comprar": 224, "pedidos": 2, "gasto": 1245.99}, {"id": "12ab9334", "estado": "MG", "ultima_compra": "2017-12-13", "dias_sin_comprar": 259, "pedidos": 2, "gasto": 1233.92}, {"id": "673e1a98", "estado": "RS", "ultima_compra": "2017-06-03", "dias_sin_comprar": 452, "pedidos": 1, "gasto": 1228.5}, {"id": "2429bb51", "estado": "RS", "ultima_compra": "2017-02-10", "dias_sin_comprar": 565, "pedidos": 1, "gasto": 1221.03}, {"id": "06aba183", "estado": "MG", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1200.0}, {"id": "142d5012", "estado": "SP", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "22770768", "estado": "RJ", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "2e84e96b", "estado": "BA", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "38589c29", "estado": "MA", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1200.0}, {"id": "3e45a109", "estado": "SE", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "402a7717", "estado": "SC", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1200.0}, {"id": "62a459e5", "estado": "AC", "ultima_compra": "2017-09-03", "dias_sin_comprar": 360, "pedidos": 1, "gasto": 1200.0}, {"id": "6f038d97", "estado": "PA", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1200.0}, {"id": "75aa3869", "estado": "RJ", "ultima_compra": "2017-08-28", "dias_sin_comprar": 366, "pedidos": 1, "gasto": 1200.0}, {"id": "7b7a886f", "estado": "AL", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1200.0}, {"id": "7d7dab6f", "estado": "SP", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "90388457", "estado": "SP", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1200.0}, {"id": "905d074d", "estado": "RO", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "9b0032ab", "estado": "DF", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "9d12af31", "estado": "RJ", "ultima_compra": "2018-02-28", "dias_sin_comprar": 182, "pedidos": 1, "gasto": 1200.0}, {"id": "b61b38d8", "estado": "MG", "ultima_compra": "2017-08-28", "dias_sin_comprar": 366, "pedidos": 1, "gasto": 1200.0}, {"id": "c106df92", "estado": "RJ", "ultima_compra": "2017-08-31", "dias_sin_comprar": 363, "pedidos": 1, "gasto": 1200.0}, {"id": "c83a0fac", "estado": "MA", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1200.0}, {"id": "cbbe4b5b", "estado": "TO", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1200.0}, {"id": "df171089", "estado": "SP", "ultima_compra": "2017-08-28", "dias_sin_comprar": 366, "pedidos": 1, "gasto": 1200.0}, {"id": "e302c322", "estado": "RS", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1200.0}, {"id": "1e497c35", "estado": "SP", "ultima_compra": "2017-05-21", "dias_sin_comprar": 465, "pedidos": 1, "gasto": 1199.99}, {"id": "36414dc6", "estado": "RJ", "ultima_compra": "2017-05-29", "dias_sin_comprar": 457, "pedidos": 1, "gasto": 1199.99}, {"id": "87bbba87", "estado": "PB", "ultima_compra": "2017-10-30", "dias_sin_comprar": 303, "pedidos": 1, "gasto": 1199.99}, {"id": "919ea99f", "estado": "RJ", "ultima_compra": "2017-07-17", "dias_sin_comprar": 408, "pedidos": 1, "gasto": 1199.99}, {"id": "8460af5a", "estado": "RS", "ultima_compra": "2017-09-11", "dias_sin_comprar": 352, "pedidos": 1, "gasto": 1199.95}, {"id": "0480fb29", "estado": "PA", "ultima_compra": "2017-08-02", "dias_sin_comprar": 392, "pedidos": 1, "gasto": 1199.9}, {"id": "06b6656e", "estado": "MG", "ultima_compra": "2017-04-05", "dias_sin_comprar": 511, "pedidos": 1, "gasto": 1199.9}, {"id": "2de3c52d", "estado": "PA", "ultima_compra": "2018-01-10", "dias_sin_comprar": 231, "pedidos": 1, "gasto": 1199.9}, {"id": "3a52bcff", "estado": "RJ", "ultima_compra": "2017-07-28", "dias_sin_comprar": 397, "pedidos": 1, "gasto": 1199.9}, {"id": "3f06fda2", "estado": "RJ", "ultima_compra": "2017-11-21", "dias_sin_comprar": 281, "pedidos": 1, "gasto": 1199.9}, {"id": "55ab20e9", "estado": "PR", "ultima_compra": "2017-06-30", "dias_sin_comprar": 425, "pedidos": 1, "gasto": 1199.9}, {"id": "5f7f0d66", "estado": "RS", "ultima_compra": "2017-09-05", "dias_sin_comprar": 358, "pedidos": 1, "gasto": 1199.9}, {"id": "60103f79", "estado": "MT", "ultima_compra": "2017-06-15", "dias_sin_comprar": 440, "pedidos": 1, "gasto": 1199.9}, {"id": "653301d1", "estado": "MG", "ultima_compra": "2017-12-16", "dias_sin_comprar": 256, "pedidos": 1, "gasto": 1199.9}, {"id": "76265a1c", "estado": "GO", "ultima_compra": "2017-12-10", "dias_sin_comprar": 262, "pedidos": 1, "gasto": 1199.9}, {"id": "843e4826", "estado": "SP", "ultima_compra": "2017-06-05", "dias_sin_comprar": 450, "pedidos": 1, "gasto": 1199.9}, {"id": "95295e9c", "estado": "RJ", "ultima_compra": "2017-11-04", "dias_sin_comprar": 298, "pedidos": 1, "gasto": 1199.9}, {"id": "a6b61ba2", "estado": "SP", "ultima_compra": "2017-02-26", "dias_sin_comprar": 549, "pedidos": 1, "gasto": 1199.9}, {"id": "a8782b02", "estado": "MG", "ultima_compra": "2017-03-21", "dias_sin_comprar": 526, "pedidos": 1, "gasto": 1199.9}, {"id": "c114c445", "estado": "SP", "ultima_compra": "2017-05-09", "dias_sin_comprar": 477, "pedidos": 1, "gasto": 1199.9}, {"id": "e0ec68a8", "estado": "AL", "ultima_compra": "2017-05-17", "dias_sin_comprar": 469, "pedidos": 1, "gasto": 1199.9}, {"id": "e557f27b", "estado": "SP", "ultima_compra": "2017-11-06", "dias_sin_comprar": 296, "pedidos": 1, "gasto": 1199.9}, {"id": "e876149e", "estado": "MG", "ultima_compra": "2018-02-01", "dias_sin_comprar": 209, "pedidos": 1, "gasto": 1199.65}, {"id": "3732057b", "estado": "MG", "ultima_compra": "2018-02-07", "dias_sin_comprar": 203, "pedidos": 1, "gasto": 1199.0}, {"id": "6c6c296e", "estado": "GO", "ultima_compra": "2017-03-16", "dias_sin_comprar": 531, "pedidos": 1, "gasto": 1199.0}, {"id": "6dbe8af6", "estado": "BA", "ultima_compra": "2018-01-17", "dias_sin_comprar": 224, "pedidos": 1, "gasto": 1199.0}, {"id": "9eceb9f7", "estado": "PB", "ultima_compra": "2017-09-15", "dias_sin_comprar": 348, "pedidos": 1, "gasto": 1199.0}, {"id": "af53f595", "estado": "SP", "ultima_compra": "2017-11-30", "dias_sin_comprar": 272, "pedidos": 1, "gasto": 1199.0}, {"id": "c27b3b31", "estado": "SC", "ultima_compra": "2017-12-17", "dias_sin_comprar": 255, "pedidos": 1, "gasto": 1199.0}, {"id": "c3674079", "estado": "SP", "ultima_compra": "2017-06-27", "dias_sin_comprar": 428, "pedidos": 1, "gasto": 1199.0}, {"id": "d1600027", "estado": "SC", "ultima_compra": "2018-02-10", "dias_sin_comprar": 200, "pedidos": 1, "gasto": 1199.0}, {"id": "69769915", "estado": "RJ", "ultima_compra": "2017-12-16", "dias_sin_comprar": 256, "pedidos": 1, "gasto": 1198.0}, {"id": "ca6d9bc2", "estado": "RJ", "ultima_compra": "2017-07-06", "dias_sin_comprar": 419, "pedidos": 2, "gasto": 1198.0}, {"id": "28b9099d", "estado": "SC", "ultima_compra": "2017-05-07", "dias_sin_comprar": 479, "pedidos": 1, "gasto": 1197.9}, {"id": "cfe81af6", "estado": "SP", "ultima_compra": "2017-05-25", "dias_sin_comprar": 461, "pedidos": 1, "gasto": 1197.9}, {"id": "cbd08b04", "estado": "PR", "ultima_compra": "2017-09-16", "dias_sin_comprar": 347, "pedidos": 3, "gasto": 1189.7}, {"id": "51b406ec", "estado": "RJ", "ultima_compra": "2017-06-23", "dias_sin_comprar": 432, "pedidos": 1, "gasto": 1180.95}, {"id": "ee762d12", "estado": "SP", "ultima_compra": "2017-07-14", "dias_sin_comprar": 411, "pedidos": 1, "gasto": 1180.0}, {"id": "2592789c", "estado": "MA", "ultima_compra": "2017-11-21", "dias_sin_comprar": 281, "pedidos": 1, "gasto": 1175.8}, {"id": "8f90c831", "estado": "SP", "ultima_compra": "2017-11-20", "dias_sin_comprar": 282, "pedidos": 1, "gasto": 1175.0}, {"id": "b0452954", "estado": "PI", "ultima_compra": "2017-09-13", "dias_sin_comprar": 350, "pedidos": 2, "gasto": 1174.98}, {"id": "2573467b", "estado": "PA", "ultima_compra": "2017-05-02", "dias_sin_comprar": 484, "pedidos": 1, "gasto": 1169.44}, {"id": "0cb6bcb4", "estado": "PR", "ultima_compra": "2017-02-28", "dias_sin_comprar": 547, "pedidos": 1, "gasto": 1169.0}, {"id": "d5174582", "estado": "PR", "ultima_compra": "2018-02-27", "dias_sin_comprar": 183, "pedidos": 1, "gasto": 1168.0}, {"id": "401da002", "estado": "RO", "ultima_compra": "2017-12-11", "dias_sin_comprar": 261, "pedidos": 1, "gasto": 1164.9}, {"id": "21bde4e9", "estado": "MG", "ultima_compra": "2017-12-17", "dias_sin_comprar": 255, "pedidos": 2, "gasto": 1160.9}, {"id": "1d76532b", "estado": "MS", "ultima_compra": "2017-07-15", "dias_sin_comprar": 410, "pedidos": 1, "gasto": 1160.0}, {"id": "d10fea7c", "estado": "PB", "ultima_compra": "2017-06-09", "dias_sin_comprar": 446, "pedidos": 1, "gasto": 1160.0}, {"id": "ee1b5488", "estado": "RJ", "ultima_compra": "2017-06-01", "dias_sin_comprar": 454, "pedidos": 1, "gasto": 1159.0}, {"id": "bbf79cc2", "estado": "PR", "ultima_compra": "2017-05-09", "dias_sin_comprar": 477, "pedidos": 1, "gasto": 1158.25}, {"id": "9192e3c1", "estado": "RS", "ultima_compra": "2017-10-03", "dias_sin_comprar": 330, "pedidos": 1, "gasto": 1156.99}, {"id": "7fe33c78", "estado": "SE", "ultima_compra": "2018-02-21", "dias_sin_comprar": 189, "pedidos": 1, "gasto": 1155.0}, {"id": "a1382f97", "estado": "DF", "ultima_compra": "2017-11-18", "dias_sin_comprar": 284, "pedidos": 1, "gasto": 1150.0}, {"id": "729f94f1", "estado": "SC", "ultima_compra": "2017-09-11", "dias_sin_comprar": 352, "pedidos": 1, "gasto": 1149.9}, {"id": "5193199e", "estado": "SP", "ultima_compra": "2018-01-27", "dias_sin_comprar": 214, "pedidos": 1, "gasto": 1149.65}, {"id": "582af387", "estado": "SP", "ultima_compra": "2017-11-24", "dias_sin_comprar": 278, "pedidos": 1, "gasto": 1149.65}, {"id": "9a333bab", "estado": "SP", "ultima_compra": "2017-12-08", "dias_sin_comprar": 264, "pedidos": 1, "gasto": 1149.65}, {"id": "b92f5d19", "estado": "RJ", "ultima_compra": "2018-02-15", "dias_sin_comprar": 195, "pedidos": 1, "gasto": 1149.65}, {"id": "a7a0f4f2", "estado": "SP", "ultima_compra": "2018-02-07", "dias_sin_comprar": 203, "pedidos": 1, "gasto": 1149.0}, {"id": "ba57f513", "estado": "MG", "ultima_compra": "2017-09-07", "dias_sin_comprar": 356, "pedidos": 1, "gasto": 1146.0}, {"id": "d5419994", "estado": "SP", "ultima_compra": "2017-12-06", "dias_sin_comprar": 266, "pedidos": 2, "gasto": 1140.83}, {"id": "78ad39e8", "estado": "SP", "ultima_compra": "2017-05-11", "dias_sin_comprar": 475, "pedidos": 1, "gasto": 1129.34}, {"id": "d130666a", "estado": "PR", "ultima_compra": "2017-10-28", "dias_sin_comprar": 305, "pedidos": 1, "gasto": 1128.0}, {"id": "c9e65162", "estado": "RJ", "ultima_compra": "2017-12-14", "dias_sin_comprar": 258, "pedidos": 1, "gasto": 1125.9}, {"id": "2461b6b1", "estado": "MA", "ultima_compra": "2017-07-14", "dias_sin_comprar": 411, "pedidos": 1, "gasto": 1122.0}, {"id": "e724a8be", "estado": "RJ", "ultima_compra": "2018-01-15", "dias_sin_comprar": 226, "pedidos": 1, "gasto": 1119.9}, {"id": "3b0610a6", "estado": "PR", "ultima_compra": "2017-02-28", "dias_sin_comprar": 547, "pedidos": 1, "gasto": 1117.8}, {"id": "d687c16d", "estado": "SP", "ultima_compra": "2018-01-30", "dias_sin_comprar": 211, "pedidos": 1, "gasto": 1116.0}, {"id": "e246473a", "estado": "SP", "ultima_compra": "2018-01-30", "dias_sin_comprar": 211, "pedidos": 2, "gasto": 1109.8}, {"id": "c0ad7fbb", "estado": "SP", "ultima_compra": "2017-11-23", "dias_sin_comprar": 279, "pedidos": 1, "gasto": 1109.0}, {"id": "5fe66773", "estado": "BA", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 1, "gasto": 1107.98}, {"id": "6c2dbbeb", "estado": "SP", "ultima_compra": "2017-11-19", "dias_sin_comprar": 283, "pedidos": 1, "gasto": 1106.99}, {"id": "93d21068", "estado": "BA", "ultima_compra": "2018-01-09", "dias_sin_comprar": 232, "pedidos": 1, "gasto": 1105.0}, {"id": "a7f2edcd", "estado": "SP", "ultima_compra": "2017-06-11", "dias_sin_comprar": 444, "pedidos": 1, "gasto": 1104.44}, {"id": "63c78253", "estado": "RJ", "ultima_compra": "2018-02-26", "dias_sin_comprar": 184, "pedidos": 1, "gasto": 1102.39}, {"id": "2243a3db", "estado": "SP", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1100.0}, {"id": "2d1fbbd5", "estado": "MG", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1100.0}, {"id": "3fd1cd4e", "estado": "SP", "ultima_compra": "2017-08-28", "dias_sin_comprar": 366, "pedidos": 1, "gasto": 1100.0}, {"id": "423c97d9", "estado": "SP", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1100.0}, {"id": "903e36e2", "estado": "PE", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1100.0}, {"id": "d8c9bcfd", "estado": "MG", "ultima_compra": "2018-01-31", "dias_sin_comprar": 210, "pedidos": 1, "gasto": 1100.0}, {"id": "e01b3c99", "estado": "SP", "ultima_compra": "2017-08-30", "dias_sin_comprar": 364, "pedidos": 1, "gasto": 1100.0}, {"id": "45e5e171", "estado": "PR", "ultima_compra": "2017-11-28", "dias_sin_comprar": 274, "pedidos": 1, "gasto": 1099.99}, {"id": "4db829ea", "estado": "BA", "ultima_compra": "2017-08-29", "dias_sin_comprar": 365, "pedidos": 1, "gasto": 1099.99}, {"id": "c37b132f", "estado": "RJ", "ultima_compra": "2017-10-03", "dias_sin_comprar": 330, "pedidos": 1, "gasto": 1099.99}, {"id": "ae27f6bf", "estado": "SP", "ultima_compra": "2017-03-10", "dias_sin_comprar": 537, "pedidos": 1, "gasto": 1099.9}, {"id": "f601dac3", "estado": "SP", "ultima_compra": "2017-12-02", "dias_sin_comprar": 270, "pedidos": 1, "gasto": 1099.9}, {"id": "38a4f1de", "estado": "SP", "ultima_compra": "2017-11-28", "dias_sin_comprar": 274, "pedidos": 1, "gasto": 1099.7}, {"id": "0228e299", "estado": "MT", "ultima_compra": "2017-07-21", "dias_sin_comprar": 404, "pedidos": 1, "gasto": 1099.0}, {"id": "10c6d701", "estado": "MG", "ultima_compra": "2017-09-05", "dias_sin_comprar": 358, "pedidos": 1, "gasto": 1099.0}, {"id": "143b3bef", "estado": "GO", "ultima_compra": "2017-09-19", "dias_sin_comprar": 344, "pedidos": 1, "gasto": 1099.0}, {"id": "29bafed2", "estado": "MG", "ultima_compra": "2017-09-06", "dias_sin_comprar": 357, "pedidos": 1, "gasto": 1099.0}, {"id": "2b40bf9f", "estado": "SP", "ultima_compra": "2018-01-27", "dias_sin_comprar": 214, "pedidos": 1, "gasto": 1099.0}, {"id": "41ef6bfc", "estado": "PI", "ultima_compra": "2017-02-22", "dias_sin_comprar": 553, "pedidos": 1, "gasto": 1099.0}, {"id": "09e9991c", "estado": "SP", "ultima_compra": "2018-01-10", "dias_sin_comprar": 231, "pedidos": 1, "gasto": 1098.9}, {"id": "45df9701", "estado": "MG", "ultima_compra": "2018-01-11", "dias_sin_comprar": 230, "pedidos": 1, "gasto": 1098.0}, {"id": "dcf5ec1c", "estado": "RJ", "ultima_compra": "2018-01-03", "dias_sin_comprar": 238, "pedidos": 1, "gasto": 1098.0}, {"id": "e6aede5b", "estado": "SP", "ultima_compra": "2017-11-29", "dias_sin_comprar": 273, "pedidos": 1, "gasto": 1098.0}, {"id": "f085d32f", "estado": "RS", "ultima_compra": "2017-12-06", "dias_sin_comprar": 266, "pedidos": 1, "gasto": 1098.0}, {"id": "0aadc1d2", "estado": "BA", "ultima_compra": "2017-11-28", "dias_sin_comprar": 274, "pedidos": 2, "gasto": 1097.96}, {"id": "33de26d1", "estado": "MG", "ultima_compra": "2017-11-21", "dias_sin_comprar": 281, "pedidos": 1, "gasto": 1093.0}, {"id": "c3d0ee56", "estado": "SP", "ultima_compra": "2018-01-25", "dias_sin_comprar": 216, "pedidos": 1, "gasto": 1089.0}, {"id": "2d48cce6", "estado": "RN", "ultima_compra": "2017-05-14", "dias_sin_comprar": 472, "pedidos": 1, "gasto": 1086.76}, {"id": "98a46f04", "estado": "SP", "ultima_compra": "2017-11-21", "dias_sin_comprar": 281, "pedidos": 1, "gasto": 1074.38}, {"id": "2bfb5880", "estado": "SP", "ultima_compra": "2018-01-21", "dias_sin_comprar": 220, "pedidos": 1, "gasto": 1069.36}, {"id": "d2ecc28f", "estado": "RJ", "ultima_compra": "2017-12-04", "dias_sin_comprar": 268, "pedidos": 2, "gasto": 1064.0}, {"id": "4da48d50", "estado": "SP", "ultima_compra": "2018-03-01", "dias_sin_comprar": 181, "pedidos": 1, "gasto": 1060.0}, {"id": "3961601c", "estado": "MG", "ultima_compra": "2017-12-03", "dias_sin_comprar": 269, "pedidos": 1, "gasto": 1058.0}, {"id": "6809546a", "estado": "RJ", "ultima_compra": "2017-10-20", "dias_sin_comprar": 313, "pedidos": 1, "gasto": 1058.0}, {"id": "6d107617", "estado": "SP", "ultima_compra": "2017-12-03", "dias_sin_comprar": 269, "pedidos": 1, "gasto": 1058.0}, {"id": "663e9fc2", "estado": "SP", "ultima_compra": "2017-06-28", "dias_sin_comprar": 427, "pedidos": 1, "gasto": 1056.0}, {"id": "b4fde3f3", "estado": "SC", "ultima_compra": "2018-02-26", "dias_sin_comprar": 184, "pedidos": 1, "gasto": 1055.9}, {"id": "f0f8fdb8", "estado": "MG", "ultima_compra": "2018-02-17", "dias_sin_comprar": 193, "pedidos": 1, "gasto": 1055.9}, {"id": "0d820214", "estado": "SP", "ultima_compra": "2018-02-02", "dias_sin_comprar": 208, "pedidos": 1, "gasto": 1054.0}, {"id": "32b15895", "estado": "PR", "ultima_compra": "2018-01-04", "dias_sin_comprar": 237, "pedidos": 1, "gasto": 1054.0}, {"id": "3f915483", "estado": "SP", "ultima_compra": "2018-01-28", "dias_sin_comprar": 213, "pedidos": 1, "gasto": 1054.0}, {"id": "c88c6527", "estado": "SP", "ultima_compra": "2018-02-21", "dias_sin_comprar": 189, "pedidos": 1, "gasto": 1054.0}, {"id": "083e1498", "estado": "MG", "ultima_compra": "2017-11-23", "dias_sin_comprar": 279, "pedidos": 1, "gasto": 1050.0}, {"id": "0a834292", "estado": "MS", "ultima_compra": "2017-11-03", "dias_sin_comprar": 299, "pedidos": 1, "gasto": 1050.0}, {"id": "0ec5bddf", "estado": "RJ", "ultima_compra": "2017-12-01", "dias_sin_comprar": 271, "pedidos": 1, "gasto": 1050.0}, {"id": "48670599", "estado": "DF", "ultima_compra": "2017-11-28", "dias_sin_comprar": 274, "pedidos": 1, "gasto": 1050.0}, {"id": "b632c70b", "estado": "CE", "ultima_compra": "2017-07-27", "dias_sin_comprar": 398, "pedidos": 1, "gasto": 1050.0}, {"id": "f05f7e19", "estado": "PA", "ultima_compra": "2017-08-14", "dias_sin_comprar": 380, "pedidos": 1, "gasto": 1050.0}, {"id": "29765d0c", "estado": "PR", "ultima_compra": "2018-02-28", "dias_sin_comprar": 182, "pedidos": 1, "gasto": 1049.0}, {"id": "7b069390", "estado": "PR", "ultima_compra": "2017-02-01", "dias_sin_comprar": 574, "pedidos": 1, "gasto": 1049.0}, {"id": "3f518f50", "estado": "RJ", "ultima_compra": "2017-09-01", "dias_sin_comprar": 362, "pedidos": 1, "gasto": 1048.0}]};
+
+// ---------- Formato
+const nf = new Intl.NumberFormat("es-AR");
+const nf1 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 });
+const N = v => nf.format(Math.round(v));
+const pct = v => nf1.format(v) + "%";
+function R(v) {
+  if (v >= 1e6) return "R$ " + nf1.format(v / 1e6) + " M";
+  if (v >= 1e4) return "R$ " + N(v / 1e3) + " mil";
+  return "R$ " + N(v);
+}
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+const mesLbl = m => { const [y, mm] = m.split("-"); return MESES[+mm - 1] + " " + y.slice(2); };
+const mesLargo = m => { const [y, mm] = m.split("-"); return ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][+mm - 1] + " de " + y; };
+const fecha = d => { const [y, m, dd] = d.split("-"); return `${dd}/${m}/${y}`; };
+const DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const DIAS_L = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const ESTADOS = { SP: "São Paulo", RJ: "Río de Janeiro", MG: "Minas Gerais", RS: "Rio Grande do Sul", PR: "Paraná", SC: "Santa Catarina", BA: "Bahía", DF: "Distrito Federal", GO: "Goiás", ES: "Espírito Santo", PE: "Pernambuco", CE: "Ceará" };
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// ---------- Cálculos de apoyo
+const K = D.kpis;
+const totalCat = D.categorias.reduce((s, c) => s + c.ingresos, 0);
+const top5 = D.categorias.slice(0, 5).reduce((s, c) => s + c.ingresos, 0) / totalCat * 100;
+const unaVez = D.rotacion[0];
+const mejorDia = D.mejores_dias[0];
+const picoMes = D.mensual.reduce((a, b) => (b.ingresos > a.ingresos ? b : a));
+const rec1 = D.recurrencia[0];
+const inactivos = D.segmentos[2];
+const RC = D.recontactar;
+const diasOrd = [1, 2, 3, 4, 5, 6, 0];
+const diaTop = D.dia_semana.reduce((a, b) => (b.pedidos > a.pedidos ? b : a));
+const sp = D.estados[0];
+
+// ---------- Textos
+$("lead").textContent = `Organicé y analicé ${N(K.pedidos)} pedidos de Olist, un marketplace de Brasil, para responder cuatro preguntas de negocio y proponer acciones concretas.`;
+$("periodo").textContent = `${fecha(K.desde)} al ${fecha(K.hasta)}`;
+
+const kpis = [
+  [R(K.ingresos), "facturados"],
+  [N(K.pedidos), "pedidos entregados"],
+  [N(K.clientes), "clientes"],
+  ["R$ " + N(K.ticket_promedio), "ticket promedio"],
+  [N(K.productos), "productos distintos"],
+];
+$("kpis").innerHTML = kpis.map(([v, l]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+const quick = [
+  ["clientes", "Mejores clientes", pct(D.deciles[0].pct_ingresos), "de los ingresos viene del 10% de clientes que más gasta."],
+  ["productos", "Productos", "5 categorías", `concentran el ${N(top5)}% de la facturación.`],
+  ["periodos", "Períodos", R(mejorDia.ingresos), "vendidos en un solo día: Black Friday 2017, el récord."],
+  ["recontactar", "Recontactar", N(RC.clientes), `clientes valiosos dejaron de comprar. Gastaron ${R(RC.gasto_historico)}.`],
+];
+$("quick").innerHTML = quick.map(([id, q, big, t]) =>
+  `<a class="qcard" href="#${id}"><span class="q">${q}</span><span class="big">${big}</span><span class="t">${t}</span><span class="go">Ver detalle →</span></a>`).join("");
+
+$("h-clientes").textContent = `El 10% de los clientes genera el ${N(D.deciles[0].pct_ingresos)}% de los ingresos, pero casi nadie vuelve`;
+$("t-clientes").textContent = `${N(rec1.pct_clientes)} de cada 100 clientes compraron una sola vez en dos años. El negocio depende de atraer gente nueva todo el tiempo.`;
+$("t-estados").textContent = `${ESTADOS[sp.estado]} concentra el ${N(sp.pct_ingresos)}% de los ingresos. Los 3 estados del sudeste suman más de la mitad.`;
+
+$("h-productos").textContent = `Cinco categorías sostienen el ${N(top5)}% de la facturación`;
+$("t-productos").textContent = `Salud y belleza lidera, seguida por relojes y regalos. En el otro extremo hay categorías que vendieron apenas unas pocas unidades en dos años.`;
+$("t-rotacion").textContent = `El ${N(unaVez.pct_productos)}% de los ${N(K.productos)} productos se vendió una sola vez en todo el período.`;
+
+$("h-periodos").textContent = `${mesLargo(picoMes.mes).replace(/^./, c => c.toUpperCase())} fue el mejor mes, gracias al Black Friday`;
+$("facts-periodos").innerHTML = [
+  ["gold", R(mejorDia.ingresos), `en un solo día (${fecha(mejorDia.dia)}), más del doble que cualquier otro día`],
+  ["", "Los " + DIAS_L[diaTop.dia_semana], "son el día con más pedidos. Sábado y domingo, los más flojos"],
+  ["", "76%", "de los pedidos entra entre las 10 y las 22 h. De madrugada casi no se compra"],
+].map(([c, v, l]) => `<div class="fact ${c}"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+$("h-recontactar").textContent = `${N(RC.clientes)} clientes valiosos dejaron de comprar`;
+$("t-recontactar").textContent = `El ${N(inactivos.pct_clientes)}% de los clientes lleva más de 6 meses sin comprar. Entre ellos identifiqué a los que más vale la pena recuperar.`;
+
+// ---------- Barras 100% (HTML)
+function bar100(el, legEl, parts) {
+  el.innerHTML = parts.map(p => `<div style="width:${p.w}%;background:${p.c}" title="${p.name}: ${p.txt}">${p.w >= 8 ? p.txt : ""}</div>`).join("");
+  if (legEl) legEl.innerHTML = parts.map(p => `<span><i style="background:${p.c}"></i>${p.name} · ${p.txt}</span>`).join("");
+}
+
+function pintarHTML() {
+  const cRec = [css("--accent"), css("--gold"), css("--alert")];
+  // Recurrencia: % clientes vs % ingresos
+  $("recurrencia").innerHTML = `
+    <div class="stack-row"><div class="lbl"><span>Clientes</span></div><div class="bar100" id="rb1"></div></div>
+    <div class="stack-row"><div class="lbl"><span>Ingresos</span></div><div class="bar100" id="rb2"></div></div>`;
+  const mk = key => D.recurrencia.map((r, i) => ({ name: r.segmento, w: r[key], txt: pct(r[key]), c: cRec[i] }));
+  bar100($("rb1"), $("leg-recurrencia"), mk("pct_clientes").map(p => ({ ...p })));
+  bar100($("rb2"), null, mk("pct_ingresos"));
+  $("leg-recurrencia").innerHTML = D.recurrencia.map((r, i) => `<span><i style="background:${cRec[i]}"></i>${r.segmento}: ${N(r.clientes)} clientes</span>`).join("");
+
+  const cRot = [css("--alert"), css("--gold"), css("--bar-soft"), css("--accent")];
+  bar100($("rotacion"), $("leg-rotacion"), D.rotacion.map((r, i) => ({ name: r.rango_ventas, w: r.pct_productos, txt: pct(r.pct_productos), c: cRot[i] })));
+
+  const cSeg = [css("--accent"), css("--gold"), css("--alert")];
+  bar100($("segmentos"), $("leg-segmentos"), D.segmentos.map((s, i) => ({ name: s.estado_cliente.replace(/^\d\.\s*/, ""), w: s.pct_clientes, txt: `${pct(s.pct_clientes)} (${N(s.clientes)})`, c: cSeg[i] })));
+  $("leg-segmentos").innerHTML = D.segmentos.map((s, i) => `<span><i style="background:${cSeg[i]}"></i>${s.estado_cliente.replace(/^\d\.\s*/, "")}: ${N(s.clientes)} clientes</span>`).join("");
+
+  // Heatmap
+  const max = Math.max(...D.heatmap.map(h => h.pedidos));
+  const m = {};
+  D.heatmap.forEach(h => (m[h.dia_semana + "-" + h.hora] = h.pedidos));
+  let html = `<span></span>` + Array.from({ length: 24 }, (_, h) => `<span class="h">${h % 3 === 0 ? h : ""}</span>`).join("");
+  diasOrd.forEach(d => {
+    html += `<span class="d">${DIAS[d]}</span>`;
+    for (let h = 0; h < 24; h++) {
+      const v = m[d + "-" + h] || 0;
+      const p = Math.round(6 + (v / max) * 94);
+      html += `<span class="c" style="background:color-mix(in srgb, var(--accent) ${p}%, var(--bg))" title="${DIAS_L[d]} ${h}:00 h · ${N(v)} pedidos"></span>`;
+    }
+  });
+  $("heat").innerHTML = html;
+}
+
+// ---------- Gráficos (Chart.js)
+let charts = [];
+let catModo = "top", mesModo = "ingresos";
+
+function base() {
+  Chart.defaults.font.family = css("--f-body").replace(/"/g, "");
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = css("--muted");
+  Chart.defaults.borderColor = css("--line");
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.maintainAspectRatio = false;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) Chart.defaults.animation = false;
+  Chart.defaults.plugins.tooltip.backgroundColor = css("--ink");
+  Chart.defaults.plugins.tooltip.titleColor = css("--bg");
+  Chart.defaults.plugins.tooltip.bodyColor = css("--bg");
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.displayColors = false;
+}
+
+function hbar(id, labels, data, colors, tip, ticks) {
+  return new Chart($(id), {
+    type: "bar",
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, barPercentage: .78, categoryPercentage: .9 }] },
+    options: {
+      indexAxis: "y",
+      scales: {
+        x: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: ticks } },
+        y: { grid: { display: false }, border: { display: false }, ticks: { color: css("--ink") } },
+      },
+      plugins: { tooltip: { callbacks: { label: tip } } },
+    },
+  });
+}
+
+function chartCategorias() {
+  const top = catModo === "top";
+  const rows = top ? D.categorias.slice(0, 10) : D.categorias.slice(-10).reverse();
+  $("cat-title").textContent = top ? "Las 10 categorías que más facturan" : "Las 10 categorías que menos facturan";
+  const c = top ? css("--accent") : css("--alert");
+  return hbar("ch-categorias", rows.map(r => r.nombre), rows.map(r => r.ingresos), c,
+    ctx => { const r = rows[ctx.dataIndex]; return [`Ingresos: ${R(r.ingresos)}`, `Unidades vendidas: ${N(r.unidades)}`]; },
+    v => R(v));
+}
+
+function chartMensual() {
+  const ing = mesModo === "ingresos";
+  const vals = D.mensual.map(m => (ing ? m.ingresos : m.pedidos));
+  const iPico = D.mensual.indexOf(picoMes);
+  const acc = css("--accent"), gold = css("--gold");
+  return new Chart($("ch-mensual"), {
+    type: "line",
+    data: {
+      labels: D.mensual.map(m => mesLbl(m.mes)),
+      datasets: [{
+        data: vals, borderColor: acc, borderWidth: 2.5, cubicInterpolationMode: "monotone", fill: true,
+        backgroundColor: ctx => {
+          const { chart } = ctx; const a = chart.chartArea; if (!a) return "transparent";
+          const g = chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+          g.addColorStop(0, acc + "40"); g.addColorStop(1, acc + "00"); return g;
+        },
+        pointRadius: vals.map((_, i) => (i === iPico ? 7 : 3)),
+        pointBackgroundColor: vals.map((_, i) => (i === iPico ? gold : acc)),
+        pointBorderColor: vals.map((_, i) => (i === iPico ? gold : acc)),
+        pointHoverRadius: 7,
+      }],
+    },
+    options: {
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, autoSkipPadding: 12 } },
+        y: { beginAtZero: true, grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => (ing ? R(v) : N(v)) } },
+      },
+      plugins: {
+        tooltip: { callbacks: {
+          title: it => mesLargo(D.mensual[it[0].dataIndex].mes),
+          label: ctx => { const m = D.mensual[ctx.dataIndex]; const l = [`Ingresos: ${R(m.ingresos)}`, `Pedidos: ${N(m.pedidos)}`]; if (ctx.dataIndex === iPico) l.push("Black Friday: 24/11/2017"); return l; },
+        } },
+      },
+    },
+  });
+}
+
+function crearGraficos() {
+  charts.forEach(c => c.destroy());
+  base();
+  const acc = css("--accent"), soft = css("--bar-soft");
+
+  const dec = new Chart($("ch-deciles"), {
+    type: "bar",
+    data: {
+      labels: D.deciles.map(d => (d.decil === 1 ? "Top" : d.decil + "°")),
+      datasets: [{ data: D.deciles.map(d => d.pct_ingresos), backgroundColor: D.deciles.map((_, i) => (i === 0 ? acc : soft)), borderRadius: 4 }],
+    },
+    options: {
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: false } },
+        y: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => v + "%" } },
+      },
+      plugins: { tooltip: { callbacks: {
+        title: it => (it[0].dataIndex === 0 ? "El 10% que más gasta" : `Grupo ${it[0].dataIndex + 1} de 10`),
+        label: ctx => { const d = D.deciles[ctx.dataIndex]; return [`${pct(d.pct_ingresos)} de los ingresos`, `${N(d.clientes)} clientes · ${R(d.ingresos)}`]; },
+      } } },
+    },
+  });
+
+  const topE = D.estados.slice(0, 8);
+  const resto = D.estados.slice(8);
+  const est = [...topE.map(e => ({ n: ESTADOS[e.estado] || e.estado, v: e.ingresos, p: e.pct_ingresos, c: e.clientes })),
+    { n: `Otros ${resto.length} estados`, v: resto.reduce((s, e) => s + e.ingresos, 0), p: resto.reduce((s, e) => s + e.pct_ingresos, 0), c: resto.reduce((s, e) => s + e.clientes, 0) }];
+  const estC = hbar("ch-estados", est.map(e => e.n), est.map(e => e.v), est.map((_, i) => (i === 0 ? acc : i === est.length - 1 ? soft : acc + "99")),
+    ctx => { const e = est[ctx.dataIndex]; return [`${R(e.v)} (${pct(e.p)} del total)`, `${N(e.c)} clientes`]; }, v => R(v));
+
+  const dias = diasOrd.map(d => D.dia_semana.find(x => x.dia_semana === d));
+  const diasC = new Chart($("ch-dias"), {
+    type: "bar",
+    data: { labels: dias.map(d => DIAS[d.dia_semana]), datasets: [{ data: dias.map(d => d.pedidos), backgroundColor: dias.map(d => (d === diaTop ? acc : soft)), borderRadius: 4 }] },
+    options: {
+      scales: { x: { grid: { display: false } }, y: { grid: { color: css("--line") }, border: { display: false }, ticks: { callback: v => N(v) } } },
+      plugins: { tooltip: { callbacks: { label: ctx => { const d = dias[ctx.dataIndex]; return [`${N(d.pedidos)} pedidos`, `${R(d.ingresos)}`]; } } } },
+    },
+  });
+
+  charts = [dec, estC, diasC, chartCategorias(), chartMensual()];
+}
+
+function swap(i, fn) { charts[i].destroy(); charts[i] = fn(); }
+
+function toggle(a, b, onA, onB) {
+  $(a).addEventListener("click", () => { $(a).setAttribute("aria-pressed", "true"); $(b).setAttribute("aria-pressed", "false"); onA(); });
+  $(b).addEventListener("click", () => { $(b).setAttribute("aria-pressed", "true"); $(a).setAttribute("aria-pressed", "false"); onB(); });
+}
+toggle("cat-top", "cat-bottom", () => { catModo = "top"; swap(3, chartCategorias); }, () => { catModo = "bottom"; swap(3, chartCategorias); });
+toggle("m-ing", "m-ped", () => { mesModo = "ingresos"; swap(4, chartMensual); }, () => { mesModo = "pedidos"; swap(4, chartMensual); });
+
+// ---------- Simulador
+function simular() {
+  const p = +$("sim-pct").value;
+  const cli = Math.round(RC.clientes * p / 100);
+  $("sim-pct-out").textContent = p + "%";
+  $("sim-cli").textContent = N(cli);
+  $("sim-ing").textContent = R(cli * RC.ticket_promedio);
+}
+$("sim-pct").addEventListener("input", simular);
+$("sim-note").textContent = `Estimación simple: clientes recuperados × ticket promedio de este grupo (R$ ${N(RC.ticket_promedio)} por pedido).`;
+$("facts-recontactar").innerHTML = [
+  ["", N(RC.clientes), "clientes a recontactar"],
+  ["gold", R(RC.gasto_historico), "gastaron en total antes de irse"],
+].map(([c, v, l]) => `<div class="fact ${c}"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+// ---------- Tabla
+const estadosLista = [...new Set(D.lista.map(r => r.estado))].sort();
+$("f-estado").innerHTML = `<option value="">Todos los estados</option>` + estadosLista.map(e => `<option value="${e}">${ESTADOS[e] ? e + " · " + ESTADOS[e] : e}</option>`).join("");
+let orden = { k: "gasto", dir: -1 }, visibles = 15;
+
+function filtrada() {
+  const fe = $("f-estado").value, fm = $("f-motivo").value;
+  return D.lista
+    .filter(r => (!fe || r.estado === fe) && (!fm || (fm === "rec" ? r.pedidos >= 2 : r.pedidos < 2)))
+    .sort((a, b) => (a[orden.k] > b[orden.k] ? 1 : a[orden.k] < b[orden.k] ? -1 : 0) * orden.dir);
+}
+function pintarTabla() {
+  const rows = filtrada();
+  $("tbody").innerHTML = rows.slice(0, visibles).map(r => `<tr>
+    <td class="num">${r.id}…</td>
+    <td>${r.estado}</td>
+    <td class="num">${fecha(r.ultima_compra)}</td>
+    <td class="r num">${N(r.dias_sin_comprar)}</td>
+    <td class="r num">${r.pedidos}</td>
+    <td class="r num">R$ ${N(r.gasto)}</td>
+    <td>${r.pedidos >= 2 ? '<span class="chip rec">Recurrente</span>' : '<span class="chip val">Alto valor</span>'}</td>
+  </tr>`).join("") || `<tr><td colspan="7">Ningún cliente cumple estos filtros.</td></tr>`;
+  $("t-count").textContent = `Mostrando ${Math.min(visibles, rows.length)} de ${N(rows.length)} clientes`;
+  $("more").hidden = visibles >= rows.length;
+  document.querySelectorAll("th button").forEach(b => (b.querySelector("span").textContent = b.dataset.sort === orden.k ? (orden.dir < 0 ? "↓" : "↑") : ""));
+}
+document.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.sort;
+  orden = orden.k === k ? { k, dir: -orden.dir } : { k, dir: -1 };
+  pintarTabla();
+}));
+["f-estado", "f-motivo"].forEach(id => $(id).addEventListener("change", () => { visibles = 15; pintarTabla(); }));
+$("more").addEventListener("click", () => { visibles += 15; pintarTabla(); });
+
+// ---------- Arranque y cambio de tema
+function todo() { pintarHTML(); if (window.Chart) crearGraficos(); }
+todo(); simular(); pintarTabla();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", todo);
+new MutationObserver(todo).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>

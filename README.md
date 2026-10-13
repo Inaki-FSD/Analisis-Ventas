@@ -4,6 +4,8 @@ Proyecto de análisis de datos con **Python (pandas)** y **SQL** sobre el datase
 [Brazilian E-Commerce de Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle):
 99.441 pedidos realizados entre septiembre de 2016 y octubre de 2018.
 
+**👉 [Ver el dashboard interactivo](https://inaki-fsd.github.io/Analisis-Ventas/)**
+
 El objetivo es responder cuatro preguntas de negocio:
 
 1. ¿Quiénes son los mejores clientes y cuánto aportan al total?
@@ -17,7 +19,8 @@ El objetivo es responder cuatro preguntas de negocio:
 |---|---|
 | **pandas** | Lectura, limpieza (fechas, nulos, traducción de categorías) y carga a la base |
 | **SQLite + SQL** | Consultas analíticas: CTEs, funciones de ventana (`NTILE`, `SUM() OVER`), agregaciones |
-| **matplotlib** | Visualizaciones |
+| **matplotlib** | Gráficos estáticos (PNG) |
+| **HTML + Chart.js** | Dashboard interactivo generado desde Python |
 
 ## 📁 Estructura
 
@@ -29,10 +32,14 @@ Analisis-Ventas/
 │   ├── 01_mejores_clientes.sql
 │   ├── 02_productos.sql
 │   ├── 03_estacionalidad.sql
-│   └── 04_clientes_inactivos.sql
+│   ├── 04_clientes_inactivos.sql
+│   └── 05_dashboard.sql
+├── dashboard/plantilla.html   # Diseño del dashboard
+├── docs/index.html            # Dashboard generado (GitHub Pages)
 ├── src/
 │   ├── 01_load_and_clean.py   # pandas: limpia y crea data/olist.db
-│   └── 02_analisis.py         # ejecuta el SQL, exporta tablas y gráficos
+│   ├── 02_analisis.py         # ejecuta el SQL, exporta tablas y gráficos
+│   └── 03_dashboard.py        # genera el dashboard interactivo
 ├── outputs/
 │   ├── figures/               # Gráficos PNG
 │   └── tables/                # Resultados en CSV
@@ -48,6 +55,7 @@ pip install -r requirements.txt
 # 2. Corré el pipeline
 python src/01_load_and_clean.py
 python src/02_analisis.py
+python src/03_dashboard.py   # crea docs/index.html: abrilo con doble clic
 ```
 
 ## 📐 Criterios del análisis
