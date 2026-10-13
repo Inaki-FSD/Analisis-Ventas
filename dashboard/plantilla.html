@@ -111,14 +111,16 @@ section.block { padding-block: 64px 8px; display: grid; gap: 28px; }
 .sec-head { display: grid; gap: 10px; border-top: 2px solid var(--ink); padding-top: 18px; }
 .sec-head h2 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.015em; max-width: 22ch; }
 .sec-head .lead { font-size: 18px; }
-.grid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; }
 .grid2 > * { min-width: 0; }
 @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
 .panel h3 { font-size: 19px; }
 .panel .sub { font-size: 14px; color: var(--muted); }
-.chart { position: relative; height: 300px; }
+.panel { grid-template-columns: minmax(0, 1fr); }
+.chart { position: relative; height: 300px; width: 100%; min-width: 0; overflow: hidden; }
+.chart canvas { display: block; max-width: 100%; }
 .chart.tall { height: 380px; }
 
 .toggle { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; justify-self: start; }
