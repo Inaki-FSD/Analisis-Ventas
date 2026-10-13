@@ -22,7 +22,7 @@ El objetivo es responder cuatro preguntas de negocio:
 ## 📁 Estructura
 
 ```
-olist-sales-analysis/
+Analisis-Ventas/
 ├── data/raw/              # CSV originales de Kaggle (no se suben al repo)
 ├── sql/                   # Consultas, una por pregunta de negocio
 │   ├── 00_vista_ventas.sql
