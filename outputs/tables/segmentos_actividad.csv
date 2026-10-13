@@ -1,0 +1,4 @@
+estado_cliente,clientes,pct_clientes,gasto_historico
+1. Activo (0-90 días),18520,19.84,2647037.46
+2. En riesgo (91-180 días),19706,21.11,2870649.04
+3. Inactivo (+180 días),55132,59.05,7703811.61

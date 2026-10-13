@@ -1,0 +1,7 @@
+# Datos pesados / licencia: se descargan desde Kaggle
+data/raw/*.csv
+data/*.db
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
